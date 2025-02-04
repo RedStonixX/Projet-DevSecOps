@@ -1,0 +1,36 @@
+body {
+    background-color: #f8f9fa; /* Light grey background */
+}
+.badge-lg {
+    font-size: 1.25em;
+    padding: 0.5em 1em;
+}
+.btn-lg-custom {
+    font-size: 1.25em;
+    padding: 0.5em 1em;
+}
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for cards */
+}
+.navbar {
+    background-color: #343a40; /* Dark background for navbar */
+}
+.navbar-brand, .nav-link, .btn {
+    color: #ffffff !important; /* White text for navbar items */
+}
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.1); /* Light border for the toggle button */
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+.table {
+    background-color: #ffffff; /* White background for table */
+}
+.table-dark {
+    background-color: #343a40; /* Dark background for table header */
+    color: #ffffff; /* White text for table header */
+}
+.card-margin {
+    margin-bottom: 1rem; /* Margin between cards */
+}

@@ -1,0 +1,2 @@
+Flask==XXX
+flask_sqlalchemy==XXX
