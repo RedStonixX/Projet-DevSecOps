@@ -1,3 +1,4 @@
 flask_sqlalchemy==3.1.1
 mysql-connector-python==9.2.0
 datetime==5.5
+python_dotenv==1.0.1
