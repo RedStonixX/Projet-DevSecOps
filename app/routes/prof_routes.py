@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfClasse, db
+from app.models.models import Classe, Prof, Eleve, Note, Matiere, ProfClasse, db
 
 prof_bp = Blueprint('prof', __name__)
 
@@ -46,7 +46,7 @@ def prof_add_note():
     new_note_value = request.form['new_note_value']
     new_note = Note(
         id_eleve=eleve_id,
-        id_matiere=session['user_id'],  # Assuming the prof's id_matiere is stored in the session
+        id_matiere=session['user_id'],
         note=new_note_value
     )
     db.session.add(new_note)

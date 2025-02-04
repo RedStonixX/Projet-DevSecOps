@@ -41,7 +41,7 @@ def login():
             session['user_type'] = 'eleve'
             return redirect(url_for('student.student_dashboard'))
         
-        flash('Invalid username or password')
+        flash('Identifiant ou mot de passe incorrect')
     
     return render_template('login.html')
 

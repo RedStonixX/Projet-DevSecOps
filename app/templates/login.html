@@ -101,9 +101,16 @@
                 </div>
                 <div class="input-group">
                     <label for="password">Mot de passe</label>
-                    <input type="password" name="password" id="password" placeholder="Votre mot de passe" minlength="6" required>
+                    <input type="password" name="password" id="password" placeholder="Votre mot de passe" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Se connecter</button>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="text-danger mt-2" role="alert">
+                            {{ messages[0] }}
+                        </div>
+                    {% endif %}
+                {% endwith %}
             </form>
         </div>
         <script src="{{ url_for('static', filename='js/login.js') }}"></script>
