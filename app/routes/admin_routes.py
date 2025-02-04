@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfClasse, db
+from flask import Blueprint, render_template, redirect, url_for, session, jsonify
+from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfClasse
 
 admin_bp = Blueprint('admin', __name__)
 
