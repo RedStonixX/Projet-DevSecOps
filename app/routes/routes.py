@@ -1,7 +1,25 @@
 from flask import render_template, Blueprint, request, redirect, url_for, flash, session
 from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfClasse, db
+import datetime
 
 main = Blueprint('main', __name__)
+
+@main.before_app_request
+def refresh_session():
+    """Met à jour la session et la supprime après 15 minutes d'inactivité."""
+    if 'last_activity' in session:
+        last_activity = session.get('last_activity')
+
+        if isinstance(last_activity, str):  # Vérifier si c'est une chaîne de caractères
+            last_activity = datetime.datetime.fromisoformat(last_activity)  # Convertir
+        
+            # Comparer avec l'heure actuelle (UTC)
+            if (datetime.datetime.now(datetime.timezone.utc) - last_activity).total_seconds() > 900:  # 15 minutes
+                session.clear()  # Supprime la session si inactif trop longtemps
+                return redirect(url_for('main.login'))
+    
+    # Stocke le timestamp en format ISO pour éviter les erreurs de fuseau horaire
+    session['last_activity'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 @main.route('/')
 def home():

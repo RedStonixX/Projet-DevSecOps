@@ -8,6 +8,10 @@ def admin_dashboard():
     if 'user_id' not in session or session['user_type'] != 'admin':
         return redirect(url_for('main.login'))
     
+    if not admin:  # Vérification que l’admin existe bien
+        session.clear()  # On supprime la session invalide
+        return redirect(url_for('main.login'))
+
     admin_id = session['user_id']
     admin = Admin.query.get(admin_id)
     profs = Prof.query.all()
