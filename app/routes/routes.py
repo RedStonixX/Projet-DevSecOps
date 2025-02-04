@@ -4,9 +4,15 @@ from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfCla
 main = Blueprint('main', __name__)
 
 @main.route('/')
-def index():
-    classes = Classe.query.all()
-    return render_template('index.html', classes=classes)
+def home():
+    if 'user-type' in session:
+        if session['user_type'] == 'prof':
+            return redirect(url_for('prof.prof_dashboard'))
+        elif session['user_type'] == 'eleve':
+            return redirect(url_for('student.student_dashboard'))
+        elif session['user_type'] == 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+    return redirect(url_for('main.login'))
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
