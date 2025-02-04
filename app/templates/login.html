@@ -92,21 +92,21 @@
                 <div id="f9"><span></span></div>
             </div>
         </div>
-        <script src="{{ url_for('static', filename='js/login.js') }}"></script>
         <div class="login-container">
             <h1 class="login-title">Welcome to Cyberschool</h1>
             <form action="{{ url_for('main.login') }}" method="POST" class="login-form">
                 <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" name="username" id="username" placeholder="Enter Username" required>
+                    <label for="username">Identifiant</label>
+                    <input type="text" name="username" id="username" placeholder="Votre identifiant" required>
                 </div>
                 <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" placeholder="Enter Password" minlength="6" required>
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" id="password" placeholder="Votre mot de passe" minlength="6" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Log In</button>
+                <button type="submit" class="btn btn-primary">Se connecter</button>
             </form>
         </div>
+        <script src="{{ url_for('static', filename='js/login.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 </html>
