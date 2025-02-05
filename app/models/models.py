@@ -6,7 +6,7 @@ class Admin(db.Model):
     __tablename__ = 'admins'
     id_admin = db.Column(db.Integer, primary_key=True)
     nom_admin = db.Column(db.String(255), nullable=False)
-    password = db.Column(db.String(255), nullable=False)
+    hash_password = db.Column(db.String(64), nullable=False)  # SHA-256 = 64 caractères
 
     def __repr__(self):
         return f'<Admin {self.nom_admin}>'
@@ -25,7 +25,7 @@ class Eleve(db.Model):
     id_eleve = db.Column(db.Integer, primary_key=True)
     nom_eleve = db.Column(db.String(100), nullable=False)
     id_classe = db.Column(db.Integer, db.ForeignKey('classes.id_classe'))
-    password = db.Column(db.String(100), nullable=False)
+    hash_password = db.Column(db.String(64), nullable=False)  # SHA-256
 
     def __repr__(self):
         return f'<Eleve {self.nom_eleve}>'
@@ -49,14 +49,14 @@ class Note(db.Model):
     matiere = db.relationship('Matiere', backref='notes', lazy=True)
 
     def __repr__(self):
-        return f'<Note {self.note}>'
+        return f'<Note {self.note} - Élève {self.id_eleve} - Matière {self.id_matiere}>'
 
 class Prof(db.Model):
     __tablename__ = 'profs'
     id_prof = db.Column(db.Integer, primary_key=True)
     nom_prof = db.Column(db.String(100), nullable=False)
     id_matiere = db.Column(db.Integer, db.ForeignKey('matieres.id_matiere'))
-    password = db.Column(db.String(100), nullable=False)
+    hash_password = db.Column(db.String(64), nullable=False)  # SHA-256
 
     def __repr__(self):
         return f'<Prof {self.nom_prof}>'

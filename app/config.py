@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')  # Change à une vraie clé secrète
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/ent'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/ent2'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 🔒 Sécurité des sessions

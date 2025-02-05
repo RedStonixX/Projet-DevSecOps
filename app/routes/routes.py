@@ -1,6 +1,7 @@
 from flask import render_template, Blueprint, request, redirect, url_for, flash, session
 from app.models.models import Admin, Prof, Eleve
 import datetime
+import hashlib  # Import pour le hashage SHA-256
 
 main = Blueprint('main', __name__)
 
@@ -21,6 +22,10 @@ def refresh_session():
     # Stocke le timestamp en format ISO pour éviter les erreurs de fuseau horaire
     session['last_activity'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
+def hash_password(password):
+    """Hash un mot de passe avec SHA-256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
 @main.route('/')
 def home():
     if 'user-type' in session:
@@ -37,27 +42,31 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        admin = Admin.query.filter_by(nom_admin=username, password=password).first()
+        hashed_password = hash_password(password)  # Hash du mot de passe entré
+
+        # Vérification dans la table Admin
+        admin = Admin.query.filter_by(nom_admin=username, hash_password=hashed_password).first()
         if admin:
             session['user_id'] = admin.id_admin
             session['user_type'] = 'admin'
             return redirect(url_for('admin.admin_dashboard'))
-        
-        prof = Prof.query.filter_by(nom_prof=username, password=password).first()
+
+        # Vérification dans la table Prof
+        prof = Prof.query.filter_by(nom_prof=username, hash_password=hashed_password).first()
         if prof:
             session['user_id'] = prof.id_prof
             session['user_type'] = 'prof'
             return redirect(url_for('prof.prof_dashboard'))
-        
-        eleve = Eleve.query.filter_by(nom_eleve=username, password=password).first()
+
+        # Vérification dans la table Élève
+        eleve = Eleve.query.filter_by(nom_eleve=username, hash_password=hashed_password).first()
         if eleve:
             session['user_id'] = eleve.id_eleve
             session['user_type'] = 'eleve'
             return redirect(url_for('student.student_dashboard'))
-        
+
         flash('Identifiant ou mot de passe incorrect')
-    
+
     return render_template('login.html')
 
 @main.route('/logout')
