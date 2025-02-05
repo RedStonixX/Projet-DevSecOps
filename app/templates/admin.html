@@ -48,7 +48,381 @@
                 </div>
             {% endif %}
         {% endwith %}
-        
+
+        <!-- New Cards for Liste Élève, Liste Professeur, Liste Classe, Liste Matière -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Élèves</h5>
+                        <div class="accordion mt-2" id="accordionEleves">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingEleves">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleves" aria-expanded="false" aria-controls="collapseEleves">
+                                        Liste des Élèves
+                                    </button>
+                                </h2>
+                                <div id="collapseEleves" class="accordion-collapse collapse" aria-labelledby="headingEleves" data-bs-parent="#accordionEleves">
+                                    <div class="accordion-body">
+                                        <ul class="list-group mb-2" style="max-height: 200px; overflow-y: auto;">
+                                            {% for eleve in eleves %}
+                                            <li class="list-group-item">{{ eleve.nom_eleve }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between mt-4">
+                            <button type="button" class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#editEleveModal">Modifier</button>
+                            <button type="button" class="btn btn-danger mb-2 mt-md-0" data-bs-toggle="modal" data-bs-target="#deleteEleveModal">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Professeurs</h5>
+                        <div class="accordion mt-2" id="accordionProfs">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingProfs">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProfs" aria-expanded="false" aria-controls="collapseProfs">
+                                        Liste des Professeurs
+                                    </button>
+                                </h2>
+                                <div id="collapseProfs" class="accordion-collapse collapse" aria-labelledby="headingProfs" data-bs-parent="#accordionProfs">
+                                    <div class="accordion-body">
+                                        <ul class="list-group mb-2" style="max-height: 200px; overflow-y: auto;">
+                                            {% for prof in profs %}
+                                            <li class="list-group-item">{{ prof.nom_prof }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between mt-4">
+                            <button type="button" class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#editProfModal">Modifier</button>
+                            <button type="button" class="btn btn-danger mb-2 mt-md-0">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Classes</h5>
+                        <div class="accordion mt-2" id="accordionClasses">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingClasses">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseClasses" aria-expanded="false" aria-controls="collapseClasses">
+                                        Liste des Classes
+                                    </button>
+                                </h2>
+                                <div id="collapseClasses" class="accordion-collapse collapse" aria-labelledby="headingClasses" data-bs-parent="#accordionClasses">
+                                    <div class="accordion-body">
+                                        <ul class="list-group mb-2" style="max-height: 200px; overflow-y: auto;">
+                                            {% for classe in classes %}
+                                            <li class="list-group-item">{{ classe.nom_classe }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between mt-4">
+                            <button type="button" class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#editClasseModal">Modifier</button>
+                            <button type="button" class="btn btn-danger mb-2 mt-md-0" data-bs-toggle="modal" data-bs-target="#deleteClasseModal">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Matières</h5>
+                        <div class="accordion mt-2" id="accordionMatieres">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingMatieres">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMatieres" aria-expanded="false" aria-controls="collapseMatieres">
+                                        Liste des Matières
+                                    </button>
+                                </h2>
+                                <div id="collapseMatieres" class="accordion-collapse collapse" aria-labelledby="headingMatieres" data-bs-parent="#accordionMatieres">
+                                    <div class="accordion-body">
+                                        <ul class="list-group mb-2" style="max-height: 200px; overflow-y: auto;">
+                                            {% for matiere in matieres %}
+                                            <li class="list-group-item">{{ matiere.nom_matiere }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between mt-4">
+                            <button type="button" class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#editMatiereModal">Modifier</button>
+                            <button type="button" class="btn btn-danger mb-2 mt-md-0" data-bs-toggle="modal" data-bs-target="#deleteMatiereModal">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Matiere Modal -->
+        <div class="modal fade" id="editMatiereModal" tabindex="-1" aria-labelledby="editMatiereModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editMatiereModalLabel">Ajouter une Matière</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editMatiereForm">
+                            <div class="mb-3">
+                                <label for="matiereNameInput" class="form-label">Nom de la Matière</label>
+                                <input type="text" class="form-control" id="matiereNameInput" placeholder="Entrez le nom de la matière">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="addMatiere()">Ajouter</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Matiere Modal -->
+        <div class="modal fade" id="deleteMatiereModal" tabindex="-1" aria-labelledby="deleteMatiereModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteMatiereModalLabel">Supprimer une Matière</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deleteMatiereForm">
+                            <div class="mb-3">
+                                <label for="matiereSelectDelete" class="form-label">Sélectionnez une matière</label>
+                                <select class="form-select" id="matiereSelectDelete">
+                                    <option value="" disabled selected>Sélectionner une matière</option>
+                                    {% for matiere in matieres %}
+                                    <option value="{{ matiere.id_matiere }}">{{ matiere.nom_matiere }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="deleteMatiere()">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Classe Modal -->
+        <div class="modal fade" id="editClasseModal" tabindex="-1" aria-labelledby="editClasseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editClasseModalLabel">Ajouter une Classe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editClasseForm">
+                            <div class="mb-3">
+                                <label for="classeNameInput" class="form-label">Nom de la Classe</label>
+                                <input type="text" class="form-control" id="classeNameInput" placeholder="Entrez le nom de la classe">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="addClasse()">Ajouter</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Classe Modal -->
+        <div class="modal fade" id="deleteClasseModal" tabindex="-1" aria-labelledby="deleteClasseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteClasseModalLabel">Supprimer une Classe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deleteClasseForm">
+                            <div class="mb-3">
+                                <label for="classeSelectDelete" class="form-label">Sélectionnez une classe</label>
+                                <select class="form-select" id="classeSelectDelete">
+                                    <option value="" disabled selected>Sélectionner une classe</option>
+                                    {% for classe in classes %}
+                                    <option value="{{ classe.id_classe }}">{{ classe.nom_classe }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="deleteClasse()">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Eleve Modal -->
+        <div class="modal fade" id="editEleveModal" tabindex="-1" aria-labelledby="editEleveModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editEleveModalLabel">Modifier Élève</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editEleveForm">
+                            <div class="mb-3">
+                                <label for="eleveSelectModal" class="form-label">Sélectionnez un élève</label>
+                                <select class="form-select" id="eleveSelectModal" onchange="updateClasseSelect()">
+                                    <option value="" disabled selected>Sélectionner un élève</option>
+                                    {% for eleve in eleves %}
+                                    <option value="{{ eleve.id_eleve }}" data-classe="{{ eleve.id_classe }}">{{ eleve.nom_eleve }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="classeSelectModal" class="form-label">Sélectionnez une classe</label>
+                                <select class="form-select" id="classeSelectModal">
+                                    <option value="" disabled selected>Sélectionner une classe</option>
+                                    {% for classe in classes %}
+                                    <option value="{{ classe.id_classe }}">{{ classe.nom_classe }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="saveEleveChanges()">Enregistrer</button>
+                            <button type="button" class="btn btn-secondary" onclick="showEleveNotes()">Afficher les notes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Eleve Modal -->
+        <div class="modal fade" id="deleteEleveModal" tabindex="-1" aria-labelledby="deleteEleveModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteEleveModalLabel">Supprimer un Élève</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deleteEleveForm">
+                            <div class="mb-3">
+                                <label for="eleveSelectDelete" class="form-label">Sélectionnez un élève</label>
+                                <select class="form-select" id="eleveSelectDelete">
+                                    <option value="" disabled selected>Sélectionner un élève</option>
+                                    {% for eleve in eleves %}
+                                    <option value="{{ eleve.id_eleve }}">{{ eleve.nom_eleve }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="deleteEleve()">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Eleve Modal -->
+        <div class="modal fade" id="notesEleveModal" tabindex="-1" aria-labelledby="notesEleveModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notesEleveModalLabel">Notes de l'élève</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Matière</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notesEleveTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <label for="matiereSelect" class="form-label">Sélectionnez une matière</label>
+                            <select class="form-select" id="matiereSelect" onchange="displayMatiereNotes()">
+                                <option value="" disabled selected>Sélectionner une matière</option>
+                            </select>
+                        </div>
+                        <div class="mt-3">
+                            <ul id="matiereNotesList" class="list-group"></ul>
+                        </div>
+                        <div class="mt-3">
+                            <h5>Ajouter une note dans la matière sélectionnée :</h5>
+                        </div>
+                        <div class="mt-3 d-flex">
+                            <input type="number" class="form-control me-2" id="newNoteInput" placeholder="Entrez une nouvelle note" min="0" max="20" step="0.01">
+                            <button class="btn btn-primary" onclick="addNote()">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Note Modal -->
+        <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editNoteModalLabel">Modifier la note</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editNoteForm">
+                            <div class="mb-3">
+                                <label for="editNoteInput" class="form-label">Nouvelle note</label>
+                                <input type="number" class="form-control" id="editNoteInput" min="0" max="20" step="0.01">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="saveNoteChanges()">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Edit Prof Modal -->
+        <div class="modal fade" id="editProfModal" tabindex="-1" aria-labelledby="editProfModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfModalLabel">Modifier Professeur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProfForm">
+                            <div class="mb-3">
+                                <label for="profSelectModal" class="form-label">Sélectionnez un professeur</label>
+                                <select class="form-select" id="profSelectModal" onchange="updateMatiereSelect()">
+                                    <option value="" disabled selected>Sélectionner un professeur</option>
+                                    {% for prof in profs %}
+                                    <option value="{{ prof.id_prof }}" data-matiere="{{ prof.id_matiere }}">{{ prof.nom_prof }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="matiereSelectModal" class="form-label">Sélectionnez une matière</label>
+                                <select class="form-select" id="matiereSelectModal">
+                                    <option value="" disabled selected>Sélectionner une matière</option>
+                                    {% for matiere in matieres %}
+                                    <option value="{{ matiere.id_matiere }}">{{ matiere.nom_matiere }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="saveProfChanges()">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Cards for Prof and Eleve Information -->
         <div class="row">
             <div class="col-md-6">

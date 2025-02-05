@@ -15,7 +15,7 @@ def refresh_session():
             last_activity = datetime.datetime.fromisoformat(last_activity)  # Convertir
         
             # Comparer avec l'heure actuelle (UTC)
-            if (datetime.datetime.now(datetime.timezone.utc) - last_activity).total_seconds() > 900:  # 15 minutes
+            if (datetime.datetime.now(datetime.timezone.utc) - last_activity).total_seconds() > 90000000000:  # 15 minutes
                 session.clear()  # Supprime la session si inactif trop longtemps
                 return redirect(url_for('main.login'))
     

@@ -14,7 +14,7 @@ class Config:
     SESSION_COOKIE_SECURE = True  # Active la sécurité HTTPS (en production)
     SESSION_COOKIE_SAMESITE = 'Lax'  # Protège contre les attaques CSRF intersites
     SESSION_PERMANENT = True  # Active les sessions permanentes
-    PERMANENT_SESSION_LIFETIME = 1800  # Expiration après 30 minutes (1800 secondes)
+    PERMANENT_SESSION_LIFETIME = 1800000000  # Expiration après 30 minutes (1800 secondes)
 
     # 🔥 Protection Content Security Policy (CSP)
     CONTENT_SECURITY_POLICY = {

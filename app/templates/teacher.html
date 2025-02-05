@@ -113,10 +113,10 @@
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             {{ note.note }}
                                             <div>
+                                                <button type="button" class="btn btn-sm btn-primary" onclick="openEditModal('{{ note.id_note }}', '{{ note.note }}')">Modifier</button>
                                                 <form method="POST" action="{{ url_for('prof.prof_delete_note', note_id=note.id_note) }}" style="display:inline;">
                                                     <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
                                                 </form>
-                                                <button type="button" class="btn btn-sm btn-primary" onclick="openEditModal('{{ note.id_note }}', '{{ note.note }}')">Modifier</button>
                                             </div>
                                         </li>
                                         {% endfor %}

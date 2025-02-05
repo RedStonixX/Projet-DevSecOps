@@ -6,7 +6,7 @@ class Admin(db.Model):
     __tablename__ = 'admins'
     id_admin = db.Column(db.Integer, primary_key=True)
     nom_admin = db.Column(db.String(255), nullable=False)
-    hash_password = db.Column(db.String(64), nullable=False)  # SHA-256 = 64 caractères
+    hash_password = db.Column(db.String(64), nullable=False)
 
     def __repr__(self):
         return f'<Admin {self.nom_admin}>'
