@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-md">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Portail Administration</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center d-none d-lg-flex">
+                <ul class="navbar-nav ms-auto align-items-center d-none d-md-flex">
                     <li class="nav-item">
                         <span class="nav-link">
                             <span class="badge bg-primary badge-lg">{{ username }}</span>
@@ -24,7 +24,7 @@
                         <a href="{{ url_for('main.logout') }}" class="btn btn-danger btn-lg-custom ms-3">Se déconnecter</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav d-lg-none text-center mt-3">
+                <ul class="navbar-nav d-md-none text-center mt-3">
                     <li class="nav-item">
                         <span class="nav-link">
                             <span class="badge bg-primary badge-lg">{{ username }}</span>
@@ -51,7 +51,7 @@
 
         <!-- New Cards for Liste Élève, Liste Professeur, Liste Classe, Liste Matière -->
         <div class="row mb-4">
-            <div class="col-md-3 mb-4">
+            <div class="col-12 col-md-6 col-lg-6 col-xl-3 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Élèves</h5>
@@ -66,7 +66,16 @@
                                     <div class="accordion-body">
                                         <ul class="list-group mb-2" style="max-height: 200px; overflow-y: auto;">
                                             {% for eleve in eleves %}
-                                            <li class="list-group-item">{{ eleve.nom_eleve }}</li>
+                                            <li class="list-group-item">
+                                                {{ eleve.nom_eleve }}
+                                                {% if eleve.id_classe is none %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-exclamation-circle" viewBox="0 0 16 16"
+                                                    style="cursor: pointer;" onclick="openEditEleveModal('{{ eleve.id_eleve }}')" title="La classe de l'élève n'est pas sélectionnée">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                                                </svg>
+                                                {% endif %}
+                                            </li>
                                             {% endfor %}
                                         </ul>
                                     </div>
@@ -80,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-4">
+            <div class="col-12 col-md-6 col-lg-6 col-xl-3 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Professeurs</h5>
@@ -95,7 +104,16 @@
                                     <div class="accordion-body">
                                         <ul class="list-group mb-2" style="max-height: 200px; overflow-y: auto;">
                                             {% for prof in profs %}
-                                            <li class="list-group-item">{{ prof.nom_prof }}</li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ prof.nom_prof }}
+                                                {% if prof.id_classe is none or prof.id_matiere is none %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-exclamation-circle" viewBox="0 0 16 16"
+                                                    style="cursor: pointer;" onclick="openEditProfModal('{{ prof.id_prof }}')" title="Le professeur n'a pas de matière assignée ou n'est pas assignée à au moins une classe">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                                                </svg>
+                                                {% endif %}
+                                            </li>
                                             {% endfor %}
                                         </ul>
                                     </div>
@@ -109,7 +127,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-4">
+            <div class="col-12 col-md-6 col-lg-6 col-xl-3 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Classes</h5>
@@ -138,7 +156,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-4">
+            <div class="col-12 col-md-6 col-lg-6 col-xl-3 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Matières</h5>
@@ -282,7 +300,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" id="classeSelectContainer" style="display: none;">
                                 <label for="classeSelectModal" class="form-label">Sélectionnez une classe</label>
                                 <select class="form-select" id="classeSelectModal">
                                     <option value="" disabled selected>Sélectionner une classe</option>
@@ -291,8 +309,10 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <button type="button" class="btn btn-primary" onclick="saveEleveChanges()">Enregistrer</button>
-                            <button type="button" class="btn btn-secondary" onclick="showEleveNotes()">Afficher les notes</button>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-primary" onclick="saveEleveChanges()">Enregistrer</button>
+                                <button type="button" class="btn btn-success" id="showNotesButton" style="display: none;" onclick="showEleveNotes()">Afficher les notes</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -388,7 +408,7 @@
             </div>
         </div>
 
-            <!-- Edit Prof Modal -->
+        <!-- Edit Prof Modal -->
         <div class="modal fade" id="editProfModal" tabindex="-1" aria-labelledby="editProfModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -400,20 +420,30 @@
                         <form id="editProfForm">
                             <div class="mb-3">
                                 <label for="profSelectModal" class="form-label">Sélectionnez un professeur</label>
-                                <select class="form-select" id="profSelectModal" onchange="updateMatiereSelect()">
+                                <select class="form-select" id="profSelectModal" onchange="updateMatiereAndClassesSelect()">
                                     <option value="" disabled selected>Sélectionner un professeur</option>
                                     {% for prof in profs %}
                                     <option value="{{ prof.id_prof }}" data-matiere="{{ prof.id_matiere }}">{{ prof.nom_prof }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" id="matiereSelectContainer" style="display: none;">
                                 <label for="matiereSelectModal" class="form-label">Sélectionnez une matière</label>
                                 <select class="form-select" id="matiereSelectModal">
                                     <option value="" disabled selected>Sélectionner une matière</option>
                                     {% for matiere in matieres %}
                                     <option value="{{ matiere.id_matiere }}">{{ matiere.nom_matiere }}</option>
                                     {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3" id="classesSelectContainer" style="display: none;">
+                                <label for="classesSelectModal" class="form-label">Classes du professeur</label>
+                                <ul class="list-group" id="classesSelectModal"></ul>
+                            </div>
+                            <div class="mb-3" id="addClassSelectContainer" style="display: none;">
+                                <label for="addClassSelectModal" class="form-label">Ajouter une classe</label>
+                                <select class="form-select" id="addClassSelectModal" onchange="addClassToProf()">
+                                    <option value="" disabled selected>Sélectionner une classe</option>
                                 </select>
                             </div>
                             <button type="button" class="btn btn-primary" onclick="saveProfChanges()">Enregistrer</button>
@@ -468,7 +498,7 @@
                             <h5>Profs :</h5>
                             <ul id="eleveProfs"></ul>
                             <h5>Moyenne générale : <span id="eleveMoyenne"></span></h5>
-                            <button class="btn btn-primary mt-3" onclick="displayEleveNotes()">Afficher les notes</button>
+                            <button class="btn btn-success mt-3" onclick="displayEleveNotes()">Afficher les notes</button>
                             <div id="eleveNotes" style="display: none;" class="mt-3">
                                 <h5>Notes :</h5>
                                 <div class="table-responsive">
@@ -490,8 +520,43 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Informations sur une classe
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="classeSelect" class="form-label">Sélectionnez une classe</label>
+                            <select class="form-select" id="classeSelect" onchange="displayClasseInfo()">
+                                <option value="" disabled selected>Sélectionner une classe</option>
+                                {% for classe in classes %}
+                                <option value="{{ classe.id_classe }}">{{ classe.nom_classe }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="classeInfo" style="display: none;">
+                            <h5>Profs :</h5>
+                            <ul id="classeProfs"></ul>
+                            <h5>Moyenne générale par matière :</h5>
+                            <ul id="classeMoyennesMatieres"></ul>
+                            <h5>Moyenne générale de la classe : <span id="classeMoyenneGenerale"></span></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Bouton flottant -->
+    <button class="btn btn-success btn-floating" id="floatingButton" onclick="handleFloatingButtonClick()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+          </svg>
+    </button>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>

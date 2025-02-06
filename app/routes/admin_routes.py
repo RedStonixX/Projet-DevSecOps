@@ -20,11 +20,12 @@ def admin_dashboard():
 @admin_bp.route('/admin/prof_info/<int:prof_id>')
 def prof_info(prof_id):
     prof = Prof.query.get(prof_id)
-    matiere = Matiere.query.get(prof.id_matiere).nom_matiere
+    matiere = Matiere.query.get(prof.id_matiere).nom_matiere if prof.id_matiere else None
     classes = Classe.query.join(ProfClasse).filter(ProfClasse.id_prof == prof_id).all()
     class_names = [classe.nom_classe for classe in classes]
+    all_classes = [classe.nom_classe for classe in Classe.query.all()]
     
-    return jsonify(matiere=matiere, classes=class_names)
+    return jsonify(matiere=matiere, classes=class_names, all_classes=all_classes)
 
 @admin_bp.route('/admin/eleve_info/<int:eleve_id>')
 def eleve_info(eleve_id):
@@ -187,3 +188,47 @@ def update_prof_matiere():
     
     return jsonify({'success': True})
 
+@admin_bp.route('/admin/remove_class_from_prof', methods=['POST'])
+def remove_class_from_prof():
+    data = request.get_json()
+    prof_id = data.get('prof_id')
+    class_name = data.get('class_name')
+    
+    classe = Classe.query.filter_by(nom_classe=class_name).first()
+    ProfClasse.query.filter_by(id_prof=prof_id, id_classe=classe.id_classe).delete()
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@admin_bp.route('/admin/add_class_to_prof', methods=['POST'])
+def add_class_to_prof():
+    data = request.get_json()
+    prof_id = data.get('prof_id')
+    class_name = data.get('class_name')
+    
+    classe = Classe.query.filter_by(nom_classe=class_name).first()
+    prof_classe = ProfClasse(id_prof=prof_id, id_classe=classe.id_classe)
+    db.session.add(prof_classe)
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@admin_bp.route('/admin/classe_info/<int:classe_id>')
+def classe_info(classe_id):
+    classe = Classe.query.get(classe_id)
+    profs = Prof.query.join(ProfClasse).filter(ProfClasse.id_classe == classe_id).all()
+    notes = Note.query.join(Eleve).filter(Eleve.id_classe == classe_id).all()
+
+    prof_info = [{'nom': prof.nom_prof, 'matiere': Matiere.query.get(prof.id_matiere).nom_matiere} for prof in profs]
+
+    notes_par_matiere = {}
+    for note in notes:
+        matiere = Matiere.query.get(note.id_matiere).nom_matiere
+        if matiere not in notes_par_matiere:
+            notes_par_matiere[matiere] = []
+        notes_par_matiere[matiere].append(note.note)
+
+    moyennes_matieres = {matiere: float(sum(notes)) / len(notes) for matiere, notes in notes_par_matiere.items()}
+    moyenne_generale = float(sum(sum(notes) for notes in notes_par_matiere.values())) / sum(len(notes) for notes in notes_par_matiere.values())
+
+    return jsonify(profs=prof_info, moyennes_matieres=moyennes_matieres, moyenne_generale=moyenne_generale)

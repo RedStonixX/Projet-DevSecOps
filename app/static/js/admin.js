@@ -84,10 +84,17 @@ let currentNoteIndex;
 
 function updateClasseSelect() {
     const eleveSelect = document.getElementById('eleveSelectModal');
+    const classeSelectContainer = document.getElementById('classeSelectContainer');
     const classeSelect = document.getElementById('classeSelectModal');
+    const showNotesButton = document.getElementById('showNotesButton');
     const selectedEleve = eleveSelect.options[eleveSelect.selectedIndex];
     const classeId = selectedEleve.getAttribute('data-classe');
 
+    // Afficher le conteneur de sélection de la classe et le bouton "Afficher les notes"
+    classeSelectContainer.style.display = 'block';
+    showNotesButton.style.display = 'block';
+
+    // Mettre à jour la sélection de la classe
     for (let i = 0; i < classeSelect.options.length; i++) {
         if (classeSelect.options[i].value == classeId) {
             classeSelect.selectedIndex = i;
@@ -96,6 +103,32 @@ function updateClasseSelect() {
             classeSelect.selectedIndex = 0;
         }
     }
+}
+
+function saveProfChanges() {
+    const profId = document.getElementById('profSelectModal').value;
+    const matiereId = document.getElementById('matiereSelectModal').value;
+
+    fetch('/admin/update_prof_matiere', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prof_id: profId, matiere_id: matiereId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Les modifications ont été enregistrées avec succès.');
+            location.reload();
+        } else {
+            alert('Une erreur est survenue lors de l\'enregistrement des modifications.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de l\'enregistrement des modifications.');
+    });
 }
 
 function saveEleveChanges() {
@@ -175,6 +208,22 @@ function displayMatiereNotes() {
                 matiereNotesList.appendChild(li);
             });
         });
+}
+
+function openEditEleveModal(eleveId) {
+    const eleveSelectModal = document.getElementById('eleveSelectModal');
+    eleveSelectModal.value = eleveId;
+    updateClasseSelect();
+    const editEleveModal = new bootstrap.Modal(document.getElementById('editEleveModal'));
+    editEleveModal.show();
+}
+
+function openEditProfModal(profId) {
+    const profSelectModal = document.getElementById('profSelectModal');
+    profSelectModal.value = profId;
+    updateMatiereAndClassesSelect();
+    const editProfModal = new bootstrap.Modal(document.getElementById('editProfModal'));
+    editProfModal.show();
 }
 
 function openEditNoteModal(eleveId, matiere, noteIndex, note) {
@@ -388,12 +437,24 @@ function deleteMatiere() {
     });
 }
 
-function updateMatiereSelect() {
+function updateMatiereAndClassesSelect() {
     const profSelect = document.getElementById('profSelectModal');
+    const matiereSelectContainer = document.getElementById('matiereSelectContainer');
+    const classesSelectContainer = document.getElementById('classesSelectContainer');
+    const addClassSelectContainer = document.getElementById('addClassSelectContainer');
     const matiereSelect = document.getElementById('matiereSelectModal');
+    const classesSelect = document.getElementById('classesSelectModal');
+    const addClassSelect = document.getElementById('addClassSelectModal');
     const selectedProf = profSelect.options[profSelect.selectedIndex];
     const matiereId = selectedProf.getAttribute('data-matiere');
+    const profId = selectedProf.value;
 
+    // Afficher les conteneurs
+    matiereSelectContainer.style.display = 'block';
+    classesSelectContainer.style.display = 'block';
+    addClassSelectContainer.style.display = 'block';
+
+    // Mettre à jour la sélection de la matière
     for (let i = 0; i < matiereSelect.options.length; i++) {
         if (matiereSelect.options[i].value == matiereId) {
             matiereSelect.selectedIndex = i;
@@ -402,26 +463,114 @@ function updateMatiereSelect() {
             matiereSelect.selectedIndex = 0;
         }
     }
+
+    // Mettre à jour la liste des classes
+    fetch(`/admin/prof_info/${profId}`)
+        .then(response => response.json())
+        .then(data => {
+            classesSelect.innerHTML = '';
+            addClassSelect.innerHTML = '<option value="" disabled selected>Sélectionner une classe</option>';
+            const existingClasses = new Set(data.classes);
+            data.classes.forEach(classe => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>${classe}</span>
+                    <button class="btn btn-sm btn-danger" onclick="removeClassFromProf(${profId}, '${classe}')">X</button>
+                `;
+                classesSelect.appendChild(li);
+            });
+            data.all_classes.forEach(classe => {
+                if (!existingClasses.has(classe)) {
+                    const option = document.createElement('option');
+                    option.value = classe;
+                    option.textContent = classe;
+                    addClassSelect.appendChild(option);
+                }
+            });
+        });
 }
 
-function saveProfChanges() {
-    const profId = document.getElementById('profSelectModal').value;
-    const matiereId = document.getElementById('matiereSelectModal').value;
-
-    fetch('/admin/update_prof_matiere', {
+function removeClassFromProf(profId, className) {
+    fetch('/admin/remove_class_from_prof', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ prof_id: profId, matiere_id: matiereId })
+        body: JSON.stringify({ prof_id: profId, class_name: className })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Les modifications ont été enregistrées avec succès.');
-            location.reload();
+            alert('La classe a été retirée du professeur avec succès.');
+            updateMatiereAndClassesSelect();
         } else {
-            alert('Une erreur est survenue lors de l\'enregistrement des modifications.');
+            alert('Une erreur est survenue lors de la suppression de la classe.');
         }
     });
+}
+
+function addClassToProf() {
+    const profId = document.getElementById('profSelectModal').value;
+    const className = document.getElementById('addClassSelectModal').value;
+
+    if (!className) {
+        return;
+    }
+
+    fetch('/admin/add_class_to_prof', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prof_id: profId, class_name: className })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('La classe a été ajoutée au professeur avec succès.');
+            updateMatiereAndClassesSelect();
+        } else {
+            alert('Une erreur est survenue lors de l\'ajout de la classe.');
+        }
+    });
+}
+
+function displayClasseInfo() {
+    const classeId = document.getElementById('classeSelect').value;
+    const classeInfo = document.getElementById('classeInfo');
+    const classeProfs = document.getElementById('classeProfs');
+    const classeMoyennesMatieres = document.getElementById('classeMoyennesMatieres');
+    const classeMoyenneGenerale = document.getElementById('classeMoyenneGenerale');
+
+    if (!classeId) {
+        classeInfo.style.display = 'none';
+        return;
+    }
+
+    fetch(`/admin/classe_info/${classeId}`)
+        .then(response => response.json())
+        .then(data => {
+            classeProfs.innerHTML = '';
+            data.profs.forEach(prof => {
+                const li = document.createElement('li');
+                li.textContent = `${prof.nom} (${prof.matiere})`;
+                classeProfs.appendChild(li);
+            });
+
+            classeMoyennesMatieres.innerHTML = '';
+            for (const [matiere, moyenne] of Object.entries(data.moyennes_matieres)) {
+                const li = document.createElement('li');
+                li.textContent = `${matiere} : ${parseFloat(moyenne).toFixed(2)}`;
+                classeMoyennesMatieres.appendChild(li);
+            }
+
+            classeMoyenneGenerale.textContent = parseFloat(data.moyenne_generale).toFixed(2);
+
+            classeInfo.style.display = 'block';
+        });
+}
+
+function handleFloatingButtonClick() {
+    alert('Bouton flottant cliqué!');
 }

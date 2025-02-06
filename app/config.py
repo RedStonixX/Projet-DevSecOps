@@ -5,22 +5,22 @@ load_dotenv()
 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')  # Change à une vraie clé secrète
+    SECRET_KEY = os.getenv('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/ent2'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # 🔒 Sécurité des sessions
-    SESSION_COOKIE_HTTPONLY = True  # Empêche l’accès au cookie via JavaScript
-    SESSION_COOKIE_SECURE = True  # Active la sécurité HTTPS (en production)
-    SESSION_COOKIE_SAMESITE = 'Lax'  # Protège contre les attaques CSRF intersites
-    SESSION_PERMANENT = True  # Active les sessions permanentes
-    PERMANENT_SESSION_LIFETIME = 1800000000  # Expiration après 30 minutes (1800 secondes)
+    # Sécurité des sessions
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_PERMANENT = True
+    PERMANENT_SESSION_LIFETIME = 1800000000
 
-    # 🔥 Protection Content Security Policy (CSP)
+    # Protection Content Security Policy (CSP)
     CONTENT_SECURITY_POLICY = {
-        "default-src": "'self'",  # Charge uniquement les ressources depuis ton domaine
-        "script-src": "'self'",  # Bloque les scripts externes
-        "style-src": "'self' 'unsafe-inline'",  # Autorise uniquement les styles internes
-        "img-src": "'self' data:",  # Autorise les images locales et en base64
-        "frame-ancestors": "'none'",  # Empêche l’inclusion en iframe (Clickjacking)
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data:",
+        "frame-ancestors": "'none'",
     }
