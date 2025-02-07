@@ -1,7 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfClasse, db
+from app.routes.routes import hash_password
+import string
+import random
 
 admin_bp = Blueprint('admin', __name__)
+
+@admin_bp.before_request
+def check_change_password():
+    if 'user_id' in session:
+        user = Admin.query.get(session['user_id'])
+        if user and user.change_password:
+            return redirect(url_for('main.change_password'))
 
 @admin_bp.route('/admin_dashboard')
 def admin_dashboard():
@@ -10,12 +20,24 @@ def admin_dashboard():
     
     admin_id = session['user_id']
     admin = Admin.query.get(admin_id)
+    admins = Admin.query.all()
     profs = Prof.query.all()
     eleves = Eleve.query.all()
     classes = Classe.query.all()
     matieres = Matiere.query.all()
+
+    alert_messages = []
+    for eleve in eleves:
+        if eleve.id_classe is None:
+            alert_messages.append(f'Élève sans classe : {eleve.nom_eleve}')
+    for prof in profs:
+        if not prof.has_classes() or prof.id_matiere is None:
+            alert_messages.append(f'Professeur sans classe ou matière : {prof.nom_prof}')
+    for user in admins + profs + eleves:
+        if user.change_password:
+            alert_messages.append(f'Utilisateur doit changer son mot de passe : {user.nom_admin if user in admins else user.nom_prof if user in profs else user.nom_eleve}')
     
-    return render_template('admin.html', username=admin.nom_admin, profs=profs, eleves=eleves, classes=classes, matieres=matieres)
+    return render_template('admin.html', username=admin.nom_admin, admins=admins, profs=profs, eleves=eleves, classes=classes, matieres=matieres, alert_messages=alert_messages)
 
 @admin_bp.route('/admin/prof_info/<int:prof_id>')
 def prof_info(prof_id):
@@ -107,11 +129,15 @@ def add_note():
 def add_classe():
     data = request.get_json()
     nom_classe = data.get('nom_classe')
-    
+
+    # Vérification si une classe avec le même nom existe déjà
+    if Classe.query.filter_by(nom_classe=nom_classe).first():
+        return jsonify({'success': False, 'message': 'Le nom de la classe existe déjà.'}), 400
+
     classe = Classe(nom_classe=nom_classe)
     db.session.add(classe)
     db.session.commit()
-    
+
     return jsonify({'success': True})
 
 @admin_bp.route('/admin/delete_classe', methods=['POST'])
@@ -151,11 +177,15 @@ def delete_eleve():
 def add_matiere():
     data = request.get_json()
     nom_matiere = data.get('nom_matiere')
-    
+
+    # Vérification si une matière avec le même nom existe déjà
+    if Matiere.query.filter_by(nom_matiere=nom_matiere).first():
+        return jsonify({'success': False, 'message': 'Le nom de la matière existe déjà.'}), 400
+
     matiere = Matiere(nom_matiere=nom_matiere)
     db.session.add(matiere)
     db.session.commit()
-    
+
     return jsonify({'success': True})
 
 @admin_bp.route('/admin/delete_matiere', methods=['POST'])
@@ -232,3 +262,109 @@ def classe_info(classe_id):
     moyenne_generale = float(sum(sum(notes) for notes in notes_par_matiere.values())) / sum(len(notes) for notes in notes_par_matiere.values())
 
     return jsonify(profs=prof_info, moyennes_matieres=moyennes_matieres, moyenne_generale=moyenne_generale)
+
+@admin_bp.route('/admin/delete_prof', methods=['POST'])
+def delete_prof():
+    data = request.get_json()
+    prof_id = data.get('prof_id')
+    
+    prof = Prof.query.get(prof_id)
+    if prof:
+        # Supprimer les entrées dans la table ProfClasse
+        ProfClasse.query.filter_by(id_prof=prof_id).delete()
+        # Supprimer le professeur
+        db.session.delete(prof)
+        db.session.commit()
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': 'Professeur non trouvé'}), 404
+
+@admin_bp.route('/admin/create_admin', methods=['POST'])
+def create_admin():
+    data = request.get_json()
+    nom_admin = data.get('nom_admin')
+    
+    if Admin.query.filter_by(nom_admin=nom_admin).first():
+        return jsonify({'success': False, 'message': 'Le nom de l\'admin existe déjà.'}), 400
+    
+    password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    hashed_password = hash_password(password)
+    
+    new_admin = Admin(nom_admin=nom_admin, hash_password=hashed_password, change_password=True)
+    db.session.add(new_admin)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'password': password})
+
+@admin_bp.route('/admin/create_prof', methods=['POST'])
+def create_prof():
+    data = request.get_json()
+    nom_prof = data.get('nom_prof')
+    
+    if Prof.query.filter_by(nom_prof=nom_prof).first():
+        return jsonify({'success': False, 'message': 'Le nom du professeur existe déjà.'}), 400
+    
+    password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    hashed_password = hash_password(password)
+    
+    new_prof = Prof(nom_prof=nom_prof, hash_password=hashed_password, change_password=True)
+    db.session.add(new_prof)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'password': password})
+
+@admin_bp.route('/admin/create_eleve', methods=['POST'])
+def create_eleve():
+    data = request.get_json()
+    nom_eleve = data.get('nom_eleve')
+    
+    if Eleve.query.filter_by(nom_eleve=nom_eleve).first():
+        return jsonify({'success': False, 'message': 'Le nom de l\'élève existe déjà.'}), 400
+    
+    password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    hashed_password = hash_password(password)
+    
+    new_eleve = Eleve(nom_eleve=nom_eleve, hash_password=hashed_password, change_password=True)
+    db.session.add(new_eleve)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'password': password})
+
+@admin_bp.route('/admin/reset_eleve_password', methods=['POST'])
+def reset_eleve_password():
+    data = request.get_json()
+    eleve_id = data.get('eleve_id')
+    
+    eleve = Eleve.query.get(eleve_id)
+    if eleve:
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        hashed_password = hash_password(password)
+        eleve.hash_password = hashed_password
+        eleve.change_password = True
+        db.session.commit()
+        return jsonify({'success': True, 'password': password})
+    else:
+        return jsonify({'success': False, 'message': 'Élève non trouvé'}), 404
+
+@admin_bp.route('/admin/reset_prof_password', methods=['POST'])
+def reset_prof_password():
+    data = request.get_json()
+    prof_id = data.get('prof_id')
+    
+    prof = Prof.query.get(prof_id)
+    if prof:
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        hashed_password = hash_password(password)
+        prof.hash_password = hashed_password
+        prof.change_password = True
+        db.session.commit()
+        return jsonify({'success': True, 'password': password})
+    else:
+        return jsonify({'success': False, 'message': 'Professeur non trouvé'}), 404
+
+@admin_bp.route('/admin/check_matiere_availability/<int:matiere_id>/<int:prof_id>', methods=['GET'])
+def check_matiere_availability(matiere_id, prof_id):
+    other_prof = Prof.query.filter(Prof.id_prof != prof_id, Prof.id_matiere == matiere_id).first()
+    if other_prof:
+        return jsonify({'available': False})
+    return jsonify({'available': True})

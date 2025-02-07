@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint, request, redirect, url_for, flash, session
-from app.models.models import Admin, Prof, Eleve
+from app.models.models import Admin, Prof, Eleve, db
 import datetime
 import hashlib
 
@@ -14,7 +14,7 @@ def refresh_session():
         if isinstance(last_activity, str):
             last_activity = datetime.datetime.fromisoformat(last_activity)
         
-            if (datetime.datetime.now(datetime.timezone.utc) - last_activity).total_seconds() > 90000000000:
+            if (datetime.datetime.now(datetime.timezone.utc) - last_activity).total_seconds() > 900:
                 session.clear()
                 return redirect(url_for('main.login'))
     
@@ -24,9 +24,13 @@ def hash_password(password):
     """Hash un mot de passe avec SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
 
+def check_password(password, hashed_password):
+    """Vérifie si le mot de passe correspond au hash"""
+    return hash_password(password) == hashed_password
+
 @main.route('/')
 def home():
-    if 'user-type' in session:
+    if 'user_type' in session:
         if session['user_type'] == 'prof':
             return redirect(url_for('prof.prof_dashboard'))
         elif session['user_type'] == 'eleve':
@@ -40,32 +44,52 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hashed_password = hash_password(password)  # Hash du mot de passe entré
 
-        # Vérification dans la table Admin
-        admin = Admin.query.filter_by(nom_admin=username, hash_password=hashed_password).first()
-        if admin:
-            session['user_id'] = admin.id_admin
-            session['user_type'] = 'admin'
-            return redirect(url_for('admin.admin_dashboard'))
+        user = Admin.query.filter_by(nom_admin=username).first() or \
+               Prof.query.filter_by(nom_prof=username).first() or \
+               Eleve.query.filter_by(nom_eleve=username).first()
 
-        # Vérification dans la table Prof
-        prof = Prof.query.filter_by(nom_prof=username, hash_password=hashed_password).first()
-        if prof:
-            session['user_id'] = prof.id_prof
-            session['user_type'] = 'prof'
-            return redirect(url_for('prof.prof_dashboard'))
+        if user and check_password(password, user.hash_password):
+            if isinstance(user, Prof):
+                if not user.has_classes() or user.id_matiere is None:
+                    flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
+                    return redirect(url_for('main.login'))
+            elif isinstance(user, Eleve):
+                if user.id_classe is None:
+                    flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
+                    return redirect(url_for('main.login'))
 
-        # Vérification dans la table Élève
-        eleve = Eleve.query.filter_by(nom_eleve=username, hash_password=hashed_password).first()
-        if eleve:
-            session['user_id'] = eleve.id_eleve
-            session['user_type'] = 'eleve'
-            return redirect(url_for('student.student_dashboard'))
-
-        flash('Identifiant ou mot de passe incorrect')
-
+            session['user_id'] = user.id_admin if isinstance(user, Admin) else user.id_prof if isinstance(user, Prof) else user.id_eleve
+            session['user_type'] = 'admin' if isinstance(user, Admin) else 'prof' if isinstance(user, Prof) else 'eleve'
+            if user.change_password:
+                return redirect(url_for('main.change_password'))
+            return redirect(url_for('admin.admin_dashboard') if session['user_type'] == 'admin' else url_for('prof.prof_dashboard') if session['user_type'] == 'prof' else url_for('student.student_dashboard'))
+        else:
+            flash('Identifiant ou mot de passe incorrect.')
     return render_template('login.html')
+
+@main.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        user_id = session['user_id']
+        user_type = session['user_type']
+
+        user = Admin.query.get(user_id) if user_type == 'admin' else \
+               Prof.query.get(user_id) if user_type == 'prof' else \
+               Eleve.query.get(user_id)
+
+        if user:
+            user.hash_password = hash_password(new_password)
+            user.change_password = False
+            db.session.commit()
+            flash('Mot de passe changé avec succès.')
+            return redirect(url_for('main.login'))
+
+    return render_template('change_password.html')
 
 @main.route('/logout')
 def logout():

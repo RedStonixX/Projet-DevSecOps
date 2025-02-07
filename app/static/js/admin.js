@@ -308,9 +308,9 @@ function addNote() {
 }
 
 function addClasse() {
-    const classeName = document.getElementById('classeNameInput').value;
+    const classeNameInput = document.getElementById('classeNameInput').value;
 
-    if (!classeName) {
+    if (!classeNameInput) {
         alert('Merci de remplir le nom de la classe.');
         return;
     }
@@ -320,15 +320,15 @@ function addClasse() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nom_classe: classeName })
+        body: JSON.stringify({ nom_classe: classeNameInput })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('La classe a été ajoutée avec succès.');
+            alert('Classe ajoutée avec succès.');
             location.reload();
         } else {
-            alert('Une erreur est survenue lors de l\'ajout de la classe.');
+            alert(data.message);
         }
     });
 }
@@ -386,9 +386,9 @@ function deleteEleve() {
 }
 
 function addMatiere() {
-    const matiereName = document.getElementById('matiereNameInput').value;
+    const matiereNameInput = document.getElementById('matiereNameInput').value;
 
-    if (!matiereName) {
+    if (!matiereNameInput) {
         alert('Merci de remplir le nom de la matière.');
         return;
     }
@@ -398,15 +398,15 @@ function addMatiere() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nom_matiere: matiereName })
+        body: JSON.stringify({ nom_matiere: matiereNameInput })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('La matière a été ajoutée avec succès.');
+            alert('Matière ajoutée avec succès.');
             location.reload();
         } else {
-            alert('Une erreur est survenue lors de l\'ajout de la matière.');
+            alert(data.message);
         }
     });
 }
@@ -510,6 +510,25 @@ function removeClassFromProf(profId, className) {
     });
 }
 
+function checkMatiereAvailability() {
+    const matiereSelect = document.getElementById('matiereSelectModal');
+    const selectedMatiereId = matiereSelect.value;
+    const profSelect = document.getElementById('profSelectModal');
+    const selectedProfId = profSelect.value;
+
+    fetch(`/admin/check_matiere_availability/${selectedMatiereId}/${selectedProfId}`)
+        .then(response => response.json())
+        .then(data => {
+            const matiereError = document.getElementById('matiereError');
+            if (data.available) {
+                matiereError.style.display = 'none';
+            } else {
+                matiereError.style.display = 'block';
+                matiereSelect.value = '';
+            }
+        });
+}
+
 function addClassToProf() {
     const profId = document.getElementById('profSelectModal').value;
     const className = document.getElementById('addClassSelectModal').value;
@@ -571,6 +590,143 @@ function displayClasseInfo() {
         });
 }
 
-function handleFloatingButtonClick() {
-    alert('Bouton flottant cliqué!');
+function deleteProf() {
+    const profId = document.getElementById('profSelectDelete').value;
+
+    fetch('/admin/delete_prof', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prof_id: profId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Le professeur a été supprimé avec succès.');
+            location.reload();
+        } else {
+            alert('Une erreur est survenue lors de la suppression du professeur.');
+        }
+    });
+}
+
+function openCreateUserModal() {
+    const createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+    createUserModal.show();
+}
+
+function updateUserForm() {
+    const userType = document.getElementById('userTypeSelect').value;
+    document.getElementById('adminForm').style.display = userType === 'admin' ? 'block' : 'none';
+    document.getElementById('profForm').style.display = userType === 'prof' ? 'block' : 'none';
+    document.getElementById('eleveForm').style.display = userType === 'eleve' ? 'block' : 'none';
+}
+
+function createUser() {
+    const userType = document.getElementById('userTypeSelect').value;
+    let url = '';
+    let body = {};
+
+    if (userType === 'admin') {
+        const adminName = document.getElementById('adminNameInput').value;
+        url = '/admin/create_admin';
+        body = { nom_admin: adminName };
+    } else if (userType === 'prof') {
+        const profName = document.getElementById('profNameInput').value;
+        url = '/admin/create_prof';
+        body = { nom_prof: profName };
+    } else if (userType === 'eleve') {
+        const eleveName = document.getElementById('eleveNameInput').value;
+        url = '/admin/create_eleve';
+        body = { nom_eleve: eleveName };
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const createUserModal = bootstrap.Modal.getInstance(document.getElementById('createUserModal'));
+            createUserModal.hide();
+            document.getElementById('newPasswordText').innerText = `Nouveau mot de passe : ${data.password}`;
+            const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+            passwordModal.show();
+            passwordModal._element.addEventListener('hidden.bs.modal', () => {
+                location.reload();
+            });
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+function resetElevePassword() {
+    const eleveId = document.getElementById('eleveSelectModal').value;
+
+    fetch('/admin/reset_eleve_password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ eleve_id: eleveId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const editEleveModal = bootstrap.Modal.getInstance(document.getElementById('editEleveModal'));
+            editEleveModal.hide();
+            document.getElementById('newPasswordText').innerText = `Nouveau mot de passe : ${data.password}`;
+            const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+            passwordModal.show();
+            passwordModal._element.addEventListener('hidden.bs.modal', () => {
+                location.reload();
+            });
+        } else {
+            alert('Une erreur est survenue lors de la réinitialisation du mot de passe.');
+        }
+    });
+}
+
+function resetProfPassword() {
+    const profId = document.getElementById('profSelectModal').value;
+
+    fetch('/admin/reset_prof_password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prof_id: profId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const editProfModal = bootstrap.Modal.getInstance(document.getElementById('editProfModal'));
+            editProfModal.hide();
+            document.getElementById('newPasswordText').innerText = `Nouveau mot de passe : ${data.password}`;
+            const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+            passwordModal.show();
+            passwordModal._element.addEventListener('hidden.bs.modal', () => {
+                location.reload();
+            });
+        } else {
+            alert('Une erreur est survenue lors de la réinitialisation du mot de passe.');
+        }
+    });
+}
+
+function copyPassword() {
+    const passwordText = document.getElementById('newPasswordText').innerText.replace('Nouveau mot de passe : ', '');
+    navigator.clipboard.writeText(passwordText).then(() => {
+        const copyMessage = document.getElementById('copyMessage');
+        copyMessage.style.display = 'block';
+        setTimeout(() => {
+            copyMessage.style.display = 'none';
+        }, 2000);
+    });
 }

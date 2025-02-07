@@ -967,39 +967,30 @@ to {
 }
 
 .login-container {
-    position: fixed;
-    top: 57%;
+    position: absolute;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    text-align: center;
-    color: #fff;
-    opacity: 0; /* Caché au départ */
-    animation: fadeIn 1s ease-out forwards; /* Animation au chargement */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
     animation-delay: 1.2s;
 }
 
 .login-title {
-    color: #333; /* Gris foncé */
+    text-align: center;
+    margin-bottom: 20px;
     transition: color 0.3s ease-in-out, text-shadow 0.3s ease-in-out;
-}
-
-.login-title {
-    color: #fff; /* Blanc au survol */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 
-                0 0 20px rgba(255, 255, 255, 0.6), 
-                0 0 30px rgba(255, 255, 255, 0.4);
-}
-
-.login-form {
-    padding: 20px;
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
 }
 
 .login-form .input-group {
     margin-bottom: 15px;
-    text-align: left;
+}
+
+.login-form .btn {
+    width: 100%;
 }
 
 .login-form .input-group label {
@@ -1013,12 +1004,12 @@ to {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: transparent; /* Fond transparent */
+    background-color: transparent;
     color: #fff;
 }
 
 .login-form .btn-primary {
-    background-color: #022f81; /* Bleu foncé */
+    background-color: #022f81;
     border: none;
     width: 100%;
     padding: 10px;
@@ -1029,5 +1020,5 @@ to {
 }
 
 .login-form .btn-primary:hover {
-    background-color: #245ed2; /* Bleu encore plus foncé au hover */
+    background-color: #245ed2;
 }

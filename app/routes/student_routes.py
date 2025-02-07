@@ -3,6 +3,13 @@ from app.models.models import Classe, Eleve, Note, Matiere, Prof
 
 student_bp = Blueprint('student', __name__)
 
+@student_bp.before_request
+def check_change_password():
+    if 'user_id' in session:
+        user = Eleve.query.get(session['user_id'])
+        if user and user.change_password:
+            return redirect(url_for('main.change_password'))
+
 @student_bp.route('/student_dashboard')
 def student_dashboard():
     if 'user_id' not in session or session['user_type'] != 'eleve':

@@ -7,6 +7,7 @@ class Admin(db.Model):
     id_admin = db.Column(db.Integer, primary_key=True)
     nom_admin = db.Column(db.String(255), nullable=False)
     hash_password = db.Column(db.String(64), nullable=False)
+    change_password = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<Admin {self.nom_admin}>'
@@ -25,7 +26,8 @@ class Eleve(db.Model):
     id_eleve = db.Column(db.Integer, primary_key=True)
     nom_eleve = db.Column(db.String(100), nullable=False)
     id_classe = db.Column(db.Integer, db.ForeignKey('classes.id_classe'))
-    hash_password = db.Column(db.String(64), nullable=False)  # SHA-256
+    hash_password = db.Column(db.String(64), nullable=False)
+    change_password = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<Eleve {self.nom_eleve}>'
@@ -56,10 +58,14 @@ class Prof(db.Model):
     id_prof = db.Column(db.Integer, primary_key=True)
     nom_prof = db.Column(db.String(100), nullable=False)
     id_matiere = db.Column(db.Integer, db.ForeignKey('matieres.id_matiere'))
-    hash_password = db.Column(db.String(64), nullable=False)  # SHA-256
+    hash_password = db.Column(db.String(64), nullable=False)
+    change_password = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<Prof {self.nom_prof}>'
+    
+    def has_classes(self):
+        return ProfClasse.query.filter_by(id_prof=self.id_prof).count() > 0
 
 class ProfClasse(db.Model):
     __tablename__ = 'profclasse'
