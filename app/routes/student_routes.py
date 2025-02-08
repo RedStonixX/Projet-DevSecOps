@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session
 from app.models.models import Classe, Eleve, Note, Matiere, Prof
+from app.encryption import encrypt_username, decrypt_username
 
 student_bp = Blueprint('student', __name__)
 
@@ -29,7 +30,7 @@ def student_dashboard():
         prof = Prof.query.filter_by(id_matiere=matiere.id_matiere).first()
         if matiere.nom_matiere not in notes_par_matiere:
             notes_par_matiere[matiere.nom_matiere] = {
-                'prof': prof.nom_prof if prof else 'N/A',
+                'prof': decrypt_username(prof.encrypted_nom_prof) if prof else 'N/A',  # Déchiffrer le nom du professeur
                 'notes': [],
                 'moyenne': 0
             }
@@ -48,4 +49,4 @@ def student_dashboard():
     total_class_count = len(class_notes)
     moyenne_classe = total_class_notes / total_class_count if total_class_count > 0 else 0
     
-    return render_template('student.html', username=eleve.nom_eleve, classe=classe.nom_classe, moyenne_generale=moyenne_generale, moyenne_classe=moyenne_classe, notes_par_matiere=notes_par_matiere)
+    return render_template('student.html', username=decrypt_username(eleve.encrypted_nom_eleve), classe=classe.nom_classe, moyenne_generale=moyenne_generale, moyenne_classe=moyenne_classe, notes_par_matiere=notes_par_matiere)

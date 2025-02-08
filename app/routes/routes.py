@@ -1,5 +1,6 @@
 from flask import render_template, Blueprint, request, redirect, url_for, flash, session
 from app.models.models import Admin, Prof, Eleve, db
+from app.encryption import encrypt_username, decrypt_username
 import datetime
 import hashlib
 
@@ -45,9 +46,18 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        user = Admin.query.filter_by(nom_admin=username).first() or \
-               Prof.query.filter_by(nom_prof=username).first() or \
-               Eleve.query.filter_by(nom_eleve=username).first()
+        encrypted_username = encrypt_username(username)  # Chiffrer le nom d'utilisateur
+        print(f"Nom d'utilisateur saisi: {username}")
+        print(f"Nom d'utilisateur chiffré: {encrypted_username}")
+
+        user = Admin.query.filter_by(encrypted_nom_admin=encrypted_username).first() or \
+               Prof.query.filter_by(encrypted_nom_prof=encrypted_username).first() or \
+               Eleve.query.filter_by(encrypted_nom_eleve=encrypted_username).first()
+
+        if user:
+            print(f"Utilisateur trouvé: {user.nom_admin if isinstance(user, Admin) else user.nom_prof if isinstance(user, Prof) else user.nom_eleve}")
+        else:
+            print("Utilisateur non trouvé")
 
         if user and check_password(password, user.hash_password):
             if isinstance(user, Prof):
@@ -57,7 +67,6 @@ def login():
             elif isinstance(user, Eleve):
                 if user.id_classe is None:
                     flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
-                    return redirect(url_for('main.login'))
 
             session['user_id'] = user.id_admin if isinstance(user, Admin) else user.id_prof if isinstance(user, Prof) else user.id_eleve
             session['user_type'] = 'admin' if isinstance(user, Admin) else 'prof' if isinstance(user, Prof) else 'eleve'

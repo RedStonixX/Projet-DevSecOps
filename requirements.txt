@@ -3,3 +3,4 @@ mysql-connector-python==9.2.0
 datetime==5.5
 cryptography==44.0.0
 python_dotenv==1.0.1
+pycryptodome==3.21.0

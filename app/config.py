@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/ent2'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/ent3'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Sécurité des sessions
@@ -24,3 +24,8 @@ class Config:
         "img-src": "'self' data:",
         "frame-ancestors": "'none'",
     }
+
+    # Clé de chiffrement
+    ENCRYPTION_KEY = "2ftCCsFV3YmQR+Ablj6STpdWZrJcaY2BIcf90SC/rkA="
+
+

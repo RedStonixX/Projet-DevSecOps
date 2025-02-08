@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.models.models import Classe, Prof, Eleve, Note, Matiere, ProfClasse, db
+from app.encryption import encrypt_username, decrypt_username
 
 prof_bp = Blueprint('prof', __name__)
 
@@ -34,7 +35,7 @@ def prof_dashboard():
         
         for eleve in eleves:
             notes = Note.query.filter_by(id_eleve=eleve.id_eleve, id_matiere=prof.id_matiere).all()
-            notes_par_eleve[eleve.nom_eleve] = {
+            notes_par_eleve[decrypt_username(eleve.encrypted_nom_eleve)] = {  # Déchiffrer le nom de l'élève
                 'eleve_id': eleve.id_eleve,
                 'notes': [{'id_note': note.id_note, 'note': note.note} for note in notes],
                 'moyenne': sum(note.note for note in notes) / len(notes) if notes else 0
@@ -45,7 +46,7 @@ def prof_dashboard():
         if total_count > 0:
             moyenne_generale = total_notes / total_count
     
-    return render_template('teacher.html', username=prof.nom_prof, matiere=matiere.nom_matiere, classes=classes, notes_par_eleve=notes_par_eleve, selected_classe=selected_classe, moyenne_generale=moyenne_generale)
+    return render_template('teacher.html', username=decrypt_username(prof.encrypted_nom_prof), matiere=matiere.nom_matiere, classes=classes, notes_par_eleve=notes_par_eleve, selected_classe=selected_classe, moyenne_generale=moyenne_generale)
 
 @prof_bp.route('/prof/add_note', methods=['POST'])
 def prof_add_note():

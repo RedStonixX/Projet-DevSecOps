@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models.models import Classe, Admin, Prof, Eleve, Note, Matiere, ProfClasse, db
 from app.routes.routes import hash_password
+from app.encryption import encrypt_username, decrypt_username
 import string
 import random
 
@@ -29,15 +30,15 @@ def admin_dashboard():
     alert_messages = []
     for eleve in eleves:
         if eleve.id_classe is None:
-            alert_messages.append(f'Élève sans classe : {eleve.nom_eleve}')
+            alert_messages.append(f'Élève sans classe : {decrypt_username(eleve.encrypted_nom_eleve)}')
     for prof in profs:
         if not prof.has_classes() or prof.id_matiere is None:
-            alert_messages.append(f'Professeur sans classe ou matière : {prof.nom_prof}')
+            alert_messages.append(f'Professeur sans classe ou matière : {decrypt_username(prof.encrypted_nom_prof)}')
     for user in admins + profs + eleves:
         if user.change_password:
-            alert_messages.append(f'Utilisateur doit changer son mot de passe : {user.nom_admin if user in admins else user.nom_prof if user in profs else user.nom_eleve}')
+            alert_messages.append(f'Utilisateur doit changer son mot de passe : {decrypt_username(user.encrypted_nom_admin) if user in admins else decrypt_username(user.encrypted_nom_prof) if user in profs else decrypt_username(user.encrypted_nom_eleve)}')
     
-    return render_template('admin.html', username=admin.nom_admin, admins=admins, profs=profs, eleves=eleves, classes=classes, matieres=matieres, alert_messages=alert_messages)
+    return render_template('admin.html', username=decrypt_username(admin.encrypted_nom_admin), admins=admins, profs=profs, eleves=eleves, classes=classes, matieres=matieres, alert_messages=alert_messages)
 
 @admin_bp.route('/admin/prof_info/<int:prof_id>')
 def prof_info(prof_id):
@@ -289,8 +290,9 @@ def create_admin():
     
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     hashed_password = hash_password(password)
+    encrypted_nom_admin = encrypt_username(nom_admin)  # Chiffrer le nom d'utilisateur
     
-    new_admin = Admin(nom_admin=nom_admin, hash_password=hashed_password, change_password=True)
+    new_admin = Admin(nom_admin=nom_admin, encrypted_nom_admin=encrypted_nom_admin, hash_password=hashed_password, change_password=True)
     db.session.add(new_admin)
     db.session.commit()
     
@@ -306,8 +308,9 @@ def create_prof():
     
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     hashed_password = hash_password(password)
+    encrypted_nom_prof = encrypt_username(nom_prof)  # Chiffrer le nom d'utilisateur
     
-    new_prof = Prof(nom_prof=nom_prof, hash_password=hashed_password, change_password=True)
+    new_prof = Prof(nom_prof=nom_prof, encrypted_nom_prof=encrypted_nom_prof, hash_password=hashed_password, change_password=True)
     db.session.add(new_prof)
     db.session.commit()
     
@@ -323,8 +326,9 @@ def create_eleve():
     
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     hashed_password = hash_password(password)
+    encrypted_nom_eleve = encrypt_username(nom_eleve)  # Chiffrer le nom d'utilisateur
     
-    new_eleve = Eleve(nom_eleve=nom_eleve, hash_password=hashed_password, change_password=True)
+    new_eleve = Eleve(nom_eleve=nom_eleve, encrypted_nom_eleve=encrypted_nom_eleve, hash_password=hashed_password, change_password=True)
     db.session.add(new_eleve)
     db.session.commit()
     
