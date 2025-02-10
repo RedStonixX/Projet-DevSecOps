@@ -4,3 +4,4 @@ datetime==5.5
 cryptography==44.0.0
 python_dotenv==1.0.1
 pycryptodome==3.21.0
+pymysql==1.1.1
