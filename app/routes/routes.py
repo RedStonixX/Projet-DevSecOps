@@ -141,3 +141,7 @@ def change_password():
 def logout():
     session.clear()
     return redirect(url_for(LOGIN_URL))
+
+@main.app_errorhandler(404)
+def page_not_found(e):
+    return render_template('404error.html'), 404
