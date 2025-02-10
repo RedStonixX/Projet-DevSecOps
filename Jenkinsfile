@@ -95,6 +95,18 @@ pipeline {
             }
         }
 
+        stage('Import ZAP Report into SonarQube') {
+            steps {
+                script {
+                    withSonarQubeEnv('sonarqube') {
+                        sh """
+                        curl -X POST -u $SONAR_AUTH_TOKEN: -H "Content-Type: application/json" -d @$REPORT_DIR/sonar-report.json "$SONAR_HOST_URL/api/issues/import"
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Archive Artifacts') {
             steps {
                 script {
