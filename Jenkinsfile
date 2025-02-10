@@ -98,7 +98,7 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 script {
-                    archiveArtifacts artifacts: "$REPORT_DIR/zap_report.html", allowEmptyArchive: true
+                    archiveArtifacts artifacts: "$REPORT_DIR/zap_report.json", allowEmptyArchive: true
                     archiveArtifacts artifacts: "dependency-check-report/*", allowEmptyArchive: true
                 }
             }
