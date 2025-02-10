@@ -36,7 +36,13 @@ def admin_dashboard():
             alert_messages.append(f'Professeur sans classe ou matière : {decrypt_username(prof.encrypted_nom_prof)}')
     for user in admins + profs + eleves:
         if user.change_password:
-            alert_messages.append(f'Utilisateur doit changer son mot de passe : {decrypt_username(user.encrypted_nom_admin) if user in admins else decrypt_username(user.encrypted_nom_prof) if user in profs else decrypt_username(user.encrypted_nom_eleve)}')
+            if user in admins:
+                decrypted_name = decrypt_username(user.encrypted_nom_admin)
+            elif user in profs:
+                decrypted_name = decrypt_username(user.encrypted_nom_prof)
+            else:
+                decrypted_name = decrypt_username(user.encrypted_nom_eleve)
+            alert_messages.append(f'Utilisateur doit changer son mot de passe : {decrypted_name}')
     
     return render_template('admin.html', username=decrypt_username(admin.encrypted_nom_admin), admins=admins, profs=profs, eleves=eleves, classes=classes, matieres=matieres, alert_messages=alert_messages)
 
@@ -246,7 +252,6 @@ def add_class_to_prof():
 
 @admin_bp.route('/admin/classe_info/<int:classe_id>')
 def classe_info(classe_id):
-    classe = Classe.query.get(classe_id)
     profs = Prof.query.join(ProfClasse).filter(ProfClasse.id_classe == classe_id).all()
     notes = Note.query.join(Eleve).filter(Eleve.id_classe == classe_id).all()
 

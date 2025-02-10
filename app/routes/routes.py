@@ -6,6 +6,8 @@ import hashlib
 
 main = Blueprint('main', __name__)
 
+LOGIN_URL = 'main.login'
+
 @main.before_app_request
 def refresh_session():
     """Met à jour la session et la supprime après 15 minutes d'inactivité."""
@@ -17,7 +19,7 @@ def refresh_session():
         
             if (datetime.datetime.now(datetime.timezone.utc) - last_activity).total_seconds() > 900:
                 session.clear()
-                return redirect(url_for('main.login'))
+                return redirect(url_for(LOGIN_URL))
     
     session['last_activity'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
@@ -38,7 +40,7 @@ def home():
             return redirect(url_for('student.student_dashboard'))
         elif session['user_type'] == 'admin':
             return redirect(url_for('admin.admin_dashboard'))
-    return redirect(url_for('main.login'))
+    return redirect(url_for(LOGIN_URL))
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -47,60 +49,95 @@ def login():
         password = request.form['password']
 
         encrypted_username = encrypt_username(username)  # Chiffrer le nom d'utilisateur
-        print(f"Nom d'utilisateur saisi: {username}")
-        print(f"Nom d'utilisateur chiffré: {encrypted_username}")
-
-        user = Admin.query.filter_by(encrypted_nom_admin=encrypted_username).first() or \
-               Prof.query.filter_by(encrypted_nom_prof=encrypted_username).first() or \
-               Eleve.query.filter_by(encrypted_nom_eleve=encrypted_username).first()
-
-        if user:
-            print(f"Utilisateur trouvé: {user.nom_admin if isinstance(user, Admin) else user.nom_prof if isinstance(user, Prof) else user.nom_eleve}")
-        else:
-            print("Utilisateur non trouvé")
+        user = find_user_by_encrypted_username(encrypted_username)
 
         if user and check_password(password, user.hash_password):
-            if isinstance(user, Prof):
-                if not user.has_classes() or user.id_matiere is None:
-                    flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
-                    return redirect(url_for('main.login'))
-            elif isinstance(user, Eleve):
-                if user.id_classe is None:
-                    flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
+            if not is_user_configured(user):
+                return redirect(url_for('main.login'))
 
-            session['user_id'] = user.id_admin if isinstance(user, Admin) else user.id_prof if isinstance(user, Prof) else user.id_eleve
-            session['user_type'] = 'admin' if isinstance(user, Admin) else 'prof' if isinstance(user, Prof) else 'eleve'
+            set_user_session(user)
             if user.change_password:
                 return redirect(url_for('main.change_password'))
-            return redirect(url_for('admin.admin_dashboard') if session['user_type'] == 'admin' else url_for('prof.prof_dashboard') if session['user_type'] == 'prof' else url_for('student.student_dashboard'))
+            return redirect_user_dashboard()
         else:
             flash('Identifiant ou mot de passe incorrect.')
     return render_template('login.html')
 
+def find_user_by_encrypted_username(encrypted_username):
+    user = Admin.query.filter_by(encrypted_nom_admin=encrypted_username).first() or \
+           Prof.query.filter_by(encrypted_nom_prof=encrypted_username).first() or \
+           Eleve.query.filter_by(encrypted_nom_eleve=encrypted_username).first()
+    if user:
+        if isinstance(user, Admin):
+            user_name = user.nom_admin
+        elif isinstance(user, Prof):
+            user_name = user.nom_prof
+        else:
+            user_name = user.nom_eleve
+        print(f"Utilisateur trouvé: {user_name}")
+    else:
+        print("Utilisateur non trouvé")
+    return user
+
+def is_user_configured(user):
+    if isinstance(user, Prof):
+        if not user.has_classes() or user.id_matiere is None:
+            flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
+            return False
+    elif isinstance(user, Eleve) and user.id_classe is None:
+        flash('Votre compte n\'est pas encore configuré. Veuillez contacter l\'administrateur.')
+        return False
+    return True
+
+def set_user_session(user):
+    if isinstance(user, Admin):
+        session['user_id'] = user.id_admin
+    elif isinstance(user, Prof):
+        session['user_id'] = user.id_prof
+    else:
+        session['user_id'] = user.id_eleve
+    if isinstance(user, Admin):
+        session['user_type'] = 'admin'
+    elif isinstance(user, Prof):
+        session['user_type'] = 'prof'
+    else:
+        session['user_type'] = 'eleve'
+
+def redirect_user_dashboard():
+    if session['user_type'] == 'admin':
+        return redirect(url_for('admin.admin_dashboard'))
+    elif session['user_type'] == 'prof':
+        return redirect(url_for('prof.prof_dashboard'))
+    else:
+        return redirect(url_for('student.student_dashboard'))
+
 @main.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     if 'user_id' not in session:
-        return redirect(url_for('main.login'))
+        return redirect(url_for(LOGIN_URL))
 
     if request.method == 'POST':
         new_password = request.form['new_password']
         user_id = session['user_id']
         user_type = session['user_type']
 
-        user = Admin.query.get(user_id) if user_type == 'admin' else \
-               Prof.query.get(user_id) if user_type == 'prof' else \
-               Eleve.query.get(user_id)
+        if user_type == 'admin':
+            user = Admin.query.get(user_id)
+        elif user_type == 'prof':
+            user = Prof.query.get(user_id)
+        else:
+            user = Eleve.query.get(user_id)
 
         if user:
             user.hash_password = hash_password(new_password)
             user.change_password = False
             db.session.commit()
             flash('Mot de passe changé avec succès.')
-            return redirect(url_for('main.login'))
+            return redirect(url_for(LOGIN_URL))
 
     return render_template('change_password.html')
 
 @main.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('main.login'))
+    return redirect(url_for(LOGIN_URL))

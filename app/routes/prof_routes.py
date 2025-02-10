@@ -4,6 +4,8 @@ from app.encryption import encrypt_username, decrypt_username
 
 prof_bp = Blueprint('prof', __name__)
 
+PROF_DASHBOARD = 'prof.prof_dashboard'
+
 @prof_bp.before_request
 def check_change_password():
     if 'user_id' in session:
@@ -60,7 +62,7 @@ def prof_add_note():
     db.session.add(new_note)
     db.session.commit()
     flash('Nouvelle note ajoutée avec succès')
-    return redirect(url_for('prof.prof_dashboard'))
+    return redirect(url_for(PROF_DASHBOARD))
 
 @prof_bp.route('/prof/edit_note/<int:note_id>', methods=['POST'])
 def prof_edit_note(note_id):
@@ -70,7 +72,7 @@ def prof_edit_note(note_id):
         note.note = new_note_value
         db.session.commit()
         flash('Note modifiée avec succès')
-    return redirect(url_for('prof.prof_dashboard'))
+    return redirect(url_for(PROF_DASHBOARD))
 
 @prof_bp.route('/prof/delete_note/<int:note_id>', methods=['POST'])
 def prof_delete_note(note_id):
@@ -79,4 +81,4 @@ def prof_delete_note(note_id):
         db.session.delete(note)
         db.session.commit()
         flash('Note supprimée avec succès')
-    return redirect(url_for('prof.prof_dashboard'))
+    return redirect(url_for(PROF_DASHBOARD))
