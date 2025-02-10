@@ -88,10 +88,8 @@ pipeline {
                     # Lancer un scan automatique
                     sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
 
-                    sleep 100
-
                     # # Générer un rapport
-                    sudo zap-cli --zap-url http://localhost report -o $REPORT_DIR/zap_report.html -f html
+                    curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
                     """
                 }
             }
