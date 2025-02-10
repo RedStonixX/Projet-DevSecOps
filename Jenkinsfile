@@ -86,14 +86,12 @@ pipeline {
                     sudo zap-cli --zap-url http://localhost open-url $TARGET_URL
 
                     # Lancer un scan automatique
-                    curl "http://localhost:8090/JSON/ascan/action/scan/?url=$TARGET_URL&recurse=true&inScopeOnly=true&scanPolicyName=Default&method=GET&postData=&contextId="
+                    sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
 
-                    # Attendre la fin du scan
-                    while [[ \$(curl -s http://localhost:8090/JSON/ascan/view/status | jq -r '.status') != "100" ]]; do
-                        sleep 10
-                    done
+                    sleep 100
+
                     # # Générer un rapport
-                    sudo zap-cli --zap-url http://localhost report -o $REPORT_DIR/zap_report.json -f json
+                    sudo zap-cli --zap-url http://localhost report -o $REPORT_DIR/zap_report.html -f html
                     """
                 }
             }
