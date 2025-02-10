@@ -89,7 +89,7 @@ pipeline {
                     sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
 
                     # # Générer un rapport
-                    sudo zap-cli --zap-url http://localhost report -o $REPORT_DIR/zap_report.html -f html
+                    sudo zap-cli --zap-url http://localhost report -o $REPORT_DIR/zap_report.json -f json
                     """
                 }
             }
