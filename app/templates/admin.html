@@ -238,7 +238,7 @@
                                 <input type="text" class="form-control" id="matiereNameInput" placeholder="Entrez le nom de la matière">
                             </div>
                             <div id="matiereError" class="text-danger mt-2" style="display: none;"></div>
-                            <button type="button" class="btn btn-primary" onclick="addMatiere()">Ajouter</button>
+                            <button type="button" class="btn btn-success" onclick="addMatiere()">Ajouter</button>
                         </form>
                     </div>
                 </div>
@@ -286,7 +286,7 @@
                                 <input type="text" class="form-control" id="classeNameInput" placeholder="Entrez le nom de la classe">
                             </div>
                             <div id="classeError" class="text-danger mt-2" style="display: none;"></div>
-                            <button type="button" class="btn btn-primary" onclick="addClasse()">Ajouter</button>
+                            <button type="button" class="btn btn-success" onclick="addClasse()">Ajouter</button>
                         </form>
                     </div>
                 </div>
@@ -352,7 +352,7 @@
                             </div>
                             <div class="d-flex justify-content-between mt-3">
                                 <button type="button" class="btn btn-primary" onclick="saveEleveChanges()">Enregistrer</button>
-                                <button type="button" class="btn btn-success" id="showNotesButton" style="display: none;" onclick="showEleveNotes()">Afficher les notes</button>
+                                <button type="button" class="btn btn-secondary" id="showNotesButton" style="display: none;" onclick="showEleveNotes()">Afficher les notes</button>
                             </div>
                         </form>
                     </div>
@@ -421,7 +421,7 @@
                         </div>
                         <div class="mt-3 d-flex">
                             <input type="number" class="form-control me-2" id="newNoteInput" placeholder="Entrez une nouvelle note" min="0" max="20" step="0.01">
-                            <button class="btn btn-primary" onclick="addNote()">Ajouter</button>
+                            <button class="btn btn-success" onclick="addNote()">Ajouter</button>
                         </div>
                     </div>
                 </div>
@@ -563,7 +563,7 @@
                             <h5>Profs :</h5>
                             <ul id="eleveProfs"></ul>
                             <h5>Moyenne générale : <span id="eleveMoyenne"></span></h5>
-                            <button class="btn btn-success mt-3" onclick="displayEleveNotes()">Afficher les notes</button>
+                            <button class="btn btn-secondary mt-3" onclick="displayEleveNotes()">Afficher les notes</button>
                             <div id="eleveNotes" style="display: none;" class="mt-3">
                                 <h5>Notes :</h5>
                                 <div class="table-responsive">
@@ -659,7 +659,7 @@
                                 <input type="text" class="form-control" id="eleveNameInput" placeholder="Entrez le nom de l'élève">
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary" onclick="createUser()">Créer</button>
+                        <button type="button" class="btn btn-success" onclick="createUser()">Créer</button>
                     </form>
                 </div>
             </div>
