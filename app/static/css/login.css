@@ -641,9 +641,6 @@ div {
     border-radius:100%;
     -webkit-transform:translateZ(2px);
     transform:translateZ(2px);
-    transform:translateZ(2px);
-    transform:translateZ(2px);
-    transform:translateZ(2px);
 }
 .f312 {
     bottom:0;
@@ -745,8 +742,6 @@ div {
     width:10px;
     background:#000;
     -webkit-transform:translateZ(1px);
-    transform:translateZ(1px);
-    transform:translateZ(1px);
     transform:translateZ(1px);
 }
 #f42 {

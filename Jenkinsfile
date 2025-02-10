@@ -39,6 +39,7 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=flask-app \
                             -Dsonar.sources=. \
+                            -Dsonar.python.version=3.13 \
                             -Dsonar.host.url=$SONAR_HOST_URL \
                             -Dsonar.login=$SONAR_AUTH_TOKEN
                         """
