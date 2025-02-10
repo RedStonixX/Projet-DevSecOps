@@ -1021,3 +1021,18 @@ to {
 .login-form .btn-primary:hover {
     background-color: #245ed2;
 }
+
+.btn-primary {
+    background-color: #022f81;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #245ed2;
+}
