@@ -54,7 +54,7 @@ pipeline {
                             "tool": {
                             "driver": {
                                 "name": "OWASP ZAP",
-                                "rules": ($zap.alerts[]? | {
+                                "rules": ($zap.alerts | map({
                                 "id": .pluginId,
                                 "name": .name,
                                 "shortDescription": { "text": .name },
@@ -63,10 +63,10 @@ pipeline {
                                 "properties": {
                                     "severity": .riskdesc
                                 }
-                                })
+                                }) // [])
                             }
                             },
-                            "results": ($zap.alerts[]? | {
+                            "results": ($zap.alerts | map({
                             "ruleId": .pluginId,
                             "message": { "text": .desc },
                             "locations": [{
@@ -74,10 +74,9 @@ pipeline {
                                 "artifactLocation": { "uri": .url }
                                 }
                             }]
-                            })
+                            }) // [])
                         }]
                         }' > zap-reports/zap_report.sarif
-
                     """
                 }
             }
