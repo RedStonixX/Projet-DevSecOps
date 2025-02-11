@@ -5,14 +5,10 @@ db = SQLAlchemy()
 class Admin(db.Model):
     __tablename__ = 'admins'
     id_admin = db.Column(db.Integer, primary_key=True)
-    nom_admin = db.Column(db.String(255), nullable=False)
     encrypted_nom_admin = db.Column(db.String(255), nullable=False)
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
     is_super_admin = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return f'<Admin {self.nom_admin}>'
 
 class Classe(db.Model):
     __tablename__ = 'classes'
@@ -20,28 +16,18 @@ class Classe(db.Model):
     nom_classe = db.Column(db.String(50), nullable=False)
     eleves = db.relationship('Eleve', backref='classe', lazy=True)
 
-    def __repr__(self):
-        return f'<Classe {self.nom_classe}>'
-
 class Eleve(db.Model):
     __tablename__ = 'eleves'
     id_eleve = db.Column(db.Integer, primary_key=True)
-    nom_eleve = db.Column(db.String(100), nullable=False)
     encrypted_nom_eleve = db.Column(db.String(255), nullable=False)
     id_classe = db.Column(db.Integer, db.ForeignKey('classes.id_classe'))
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
 
-    def __repr__(self):
-        return f'<Eleve {self.nom_eleve}>'
-
 class Matiere(db.Model):
     __tablename__ = 'matieres'
     id_matiere = db.Column(db.Integer, primary_key=True)
     nom_matiere = db.Column(db.String(50), nullable=False)
-
-    def __repr__(self):
-        return f'<Matiere {self.nom_matiere}>'
 
 class Note(db.Model):
     __tablename__ = 'notes'
@@ -53,20 +39,13 @@ class Note(db.Model):
     eleve = db.relationship('Eleve', backref='notes', lazy=True)
     matiere = db.relationship('Matiere', backref='notes', lazy=True)
 
-    def __repr__(self):
-        return f'<Note {self.note} - Élève {self.id_eleve} - Matière {self.id_matiere}>'
-
 class Prof(db.Model):
     __tablename__ = 'profs'
     id_prof = db.Column(db.Integer, primary_key=True)
-    nom_prof = db.Column(db.String(100), nullable=False)
     encrypted_nom_prof = db.Column(db.String(255), nullable=False)
     id_matiere = db.Column(db.Integer, db.ForeignKey('matieres.id_matiere'))
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
-
-    def __repr__(self):
-        return f'<Prof {self.nom_prof}>'
     
     def has_classes(self):
         return ProfClasse.query.filter_by(id_prof=self.id_prof).count() > 0
