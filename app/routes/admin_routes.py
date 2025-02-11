@@ -97,6 +97,13 @@ def edit_note():
     note_index = data.get('note_index')
     new_note = data.get('new_note')
     
+    try:
+        new_note = float(new_note)
+        if new_note < 0 or new_note > 20:
+            raise ValueError("La note doit être comprise entre 0 et 20.")
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    
     notes = Note.query.filter_by(id_eleve=eleve_id, id_matiere=Matiere.query.filter_by(nom_matiere=matiere).first().id_matiere).all()
     if note_index < len(notes):
         notes[note_index].note = new_note
@@ -107,16 +114,18 @@ def edit_note():
 @admin_bp.route('/admin/delete_note', methods=['POST'])
 def delete_note():
     data = request.get_json()
-    eleve_id = data.get('id_eleve')
+    eleve_id = data.get('eleve_id')
     matiere = data.get('matiere')
     note_index = data.get('note_index')
     
-    notes = Note.query.filter_by(id_eleve=eleve_id, id_matiere=Matiere.query.filter_by(nom_matiere=matiere).first().id_matiere).all()
+    matiere_id = Matiere.query.filter_by(nom_matiere=matiere).first().id_matiere
+    notes = Note.query.filter_by(id_eleve=eleve_id, id_matiere=matiere_id).all()
+    
     if note_index < len(notes):
         db.session.delete(notes[note_index])
         db.session.commit()
         return jsonify({'success': True})
-    return jsonify({'success': False})
+    return jsonify({'success': False, 'message': 'Note non trouvée ou index invalide'}), 404
 
 @admin_bp.route('/admin/add_note', methods=['POST'])
 def add_note():
@@ -124,6 +133,13 @@ def add_note():
     eleve_id = data.get('eleve_id')
     matiere = data.get('matiere')
     new_note = data.get('new_note')
+    
+    try:
+        new_note = float(new_note)
+        if new_note < 0 or new_note > 20:
+            raise ValueError("La note doit être comprise entre 0 et 20.")
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
     
     matiere_id = Matiere.query.filter_by(nom_matiere=matiere).first().id_matiere
     note = Note(id_eleve=eleve_id, id_matiere=matiere_id, note=new_note)

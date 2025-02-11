@@ -258,23 +258,28 @@ function saveNoteChanges() {
 }
 
 function deleteNote(eleveId, matiere, noteIndex) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette note?')) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
         fetch('/admin/delete_note', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ eleve_id: eleveId, matiere: matiere, note_index: noteIndex })
+            body: JSON.stringify({
+                eleve_id: eleveId,
+                matiere: matiere,
+                note_index: noteIndex
+            })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('La note a été supprimée avec succès.');
-                displayMatiereNotes();
+                alert('Note supprimée avec succès');
+                location.reload();
             } else {
-                alert('Une erreur est survenue lors de la suppression de la note.');
+                alert('Erreur lors de la suppression de la note: ' + data.message);
             }
-        });
+        })
+        .catch(error => console.error('Erreur:', error));
     }
 }
 
@@ -729,4 +734,23 @@ function copyPassword() {
             copyMessage.style.display = 'none';
         }, 2000);
     });
+}
+
+function validateNoteInput(noteInput) {
+    const noteValue = parseFloat(noteInput.value);
+    if (isNaN(noteValue) || noteValue < 0 || noteValue > 20) {
+        alert('La note doit être un nombre compris entre 0 et 20.');
+        return false;
+    }
+    return true;
+}
+
+function validateAddNoteForm() {
+    const noteInput = document.getElementById('newNoteValue');
+    return validateNoteInput(noteInput);
+}
+
+function validateEditNoteForm() {
+    const noteInput = document.getElementById('editNoteValue');
+    return validateNoteInput(noteInput);
 }
