@@ -623,7 +623,6 @@ function openCreateUserModal() {
 
 function updateUserForm() {
     const userType = document.getElementById('userTypeSelect').value;
-    document.getElementById('adminForm').style.display = userType === 'admin' ? 'block' : 'none';
     document.getElementById('profForm').style.display = userType === 'prof' ? 'block' : 'none';
     document.getElementById('eleveForm').style.display = userType === 'eleve' ? 'block' : 'none';
 }
@@ -633,11 +632,7 @@ function createUser() {
     let url = '';
     let body = {};
 
-    if (userType === 'admin') {
-        const adminName = document.getElementById('adminNameInput').value;
-        url = '/admin/create_admin';
-        body = { nom_admin: adminName };
-    } else if (userType === 'prof') {
+    if (userType === 'prof') {
         const profName = document.getElementById('profNameInput').value;
         url = '/admin/create_prof';
         body = { nom_prof: profName };

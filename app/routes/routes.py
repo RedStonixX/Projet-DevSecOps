@@ -3,6 +3,7 @@ from app.models.models import Admin, Prof, Eleve, db
 from app.encryption import encrypt_username, decrypt_username
 import datetime
 import hashlib
+import re
 
 main = Blueprint('main', __name__)
 
@@ -122,6 +123,11 @@ def change_password():
         new_password = request.form['new_password']
         user_id = session['user_id']
         user_type = session['user_type']
+
+        # Validation du mot de passe
+        if not re.match(r'^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])(?=.{8,})', new_password):
+            flash('Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.', 'danger')
+            return redirect(url_for('main.change_password'))
 
         if user_type == 'admin':
             user = Admin.query.get(user_id)
