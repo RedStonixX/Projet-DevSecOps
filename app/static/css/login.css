@@ -1,3 +1,4 @@
+/* Page dédiée au fond d'écran animé */
 * {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -12,7 +13,7 @@ body {
     color: #666;
     font-family: Arial, Helvetica, sans-serif;
     overflow: hidden;
-    height: 100vh; /* Full height */
+    height: 100vh;
 }
 
 div {
@@ -23,7 +24,7 @@ div {
     height:700px;
     width:800px;
     margin-top:-350px;
-    margin-left:-400px; /* Adjusted for new width */
+    margin-left:-400px;
     top: 50%;
     left: 50%;
     border: 1px solid #666;

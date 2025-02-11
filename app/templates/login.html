@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
+    <!--Div pour l'animation du fond de la page-->
     <div id="container">
         <div id="a1"><div id="a11"></div></div>
         <div id="a2"><div id="a21"></div></div>
@@ -90,6 +91,7 @@
             </div>
             <div id="f9"><span></span></div>
         </div>
+        <!-- Div pour le formulaire de connexion -->
         <div class="login-container">
             <h1 class="login-title">Welcome to Cyberschool</h1>
             <form action="{{ url_for('main.login') }}" method="POST" class="login-form">

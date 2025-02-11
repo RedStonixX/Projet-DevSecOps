@@ -7,16 +7,19 @@ from app.encryption import encrypt_username
 
 superadmin_bp = Blueprint('superadmin', __name__)
 
+# Vérifier si l'utilisateur est connecté et est un superadmin
 @superadmin_bp.before_request
 def check_superadmin():
     if 'user_id' not in session or session.get('user_type') != 'superadmin':
         return redirect(url_for('main.login'))
 
+# Route pour la page d'accueil du superadmin
 @superadmin_bp.route('/superadmin_dashboard')
 def superadmin_dashboard():
-    admins = Admin.query.filter_by(is_super_admin=False).all()  # Exclure les superadmins
+    admins = Admin.query.filter_by(is_super_admin=False).all()
     return render_template('superadmin.html', admins=admins)
 
+# Route pour la suppression d'un administrateur
 @superadmin_bp.route('/superadmin/delete_admin/<int:admin_id>', methods=['DELETE'])
 def delete_admin(admin_id):
     admin = Admin.query.get(admin_id)
@@ -26,6 +29,7 @@ def delete_admin(admin_id):
         return jsonify({'success': True})
     return jsonify({'success': False})
 
+# Route pour l'ajout d'un administrateur
 @superadmin_bp.route('/superadmin/add_admin', methods=['POST'])
 def add_admin():
     data = request.get_json()

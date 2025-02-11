@@ -9,6 +9,7 @@ main = Blueprint('main', __name__)
 
 LOGIN_URL = 'main.login'
 
+# Met à jour la session et la supprime après 15 minutes d'inactivité
 @main.before_app_request
 def refresh_session():
     """Met à jour la session et la supprime après 15 minutes d'inactivité."""
@@ -24,14 +25,17 @@ def refresh_session():
     
     session['last_activity'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
+# Hashage du mot de passe
 def hash_password(password):
     """Hash un mot de passe avec SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
 
+# Vérifie si le mot de passe correspond au hash
 def check_password(password, hashed_password):
     """Vérifie si le mot de passe correspond au hash"""
     return hash_password(password) == hashed_password
 
+# Redirige l'utilisateur vers la page d'accueil en fonction de son type
 @main.route('/')
 def home():
     if 'user_type' in session:
@@ -43,13 +47,14 @@ def home():
             return redirect(url_for('admin.admin_dashboard'))
     return redirect(url_for(LOGIN_URL))
 
+# Route pour la page de connexion
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        encrypted_username = encrypt_username(username)  # Chiffrer le nom d'utilisateur
+        encrypted_username = encrypt_username(username)
         user = find_user_by_encrypted_username(encrypted_username)
 
         if user and check_password(password, user.hash_password):
@@ -64,12 +69,14 @@ def login():
             flash('Identifiant ou mot de passe incorrect.')
     return render_template('login.html')
 
+# Trouve un utilisateur par son nom d'utilisateur chiffré
 def find_user_by_encrypted_username(encrypted_username):
     user = Admin.query.filter_by(encrypted_nom_admin=encrypted_username).first() or \
            Prof.query.filter_by(encrypted_nom_prof=encrypted_username).first() or \
            Eleve.query.filter_by(encrypted_nom_eleve=encrypted_username).first()
     return user
 
+# Vérifie si l'utilisateur est configuré
 def is_user_configured(user):
     if isinstance(user, Prof):
         if not user.has_classes() or user.id_matiere is None:
@@ -80,6 +87,7 @@ def is_user_configured(user):
         return False
     return True
 
+# Définit la session de l'utilisateur
 def set_user_session(user):
     if isinstance(user, Admin):
         session['user_id'] = user.id_admin
@@ -94,6 +102,7 @@ def set_user_session(user):
         session['user_id'] = user.id_eleve
         session['user_type'] = 'eleve'
 
+# Redirige l'utilisateur vers le tableau de bord en fonction de son type
 def redirect_user_dashboard():
     if session['user_type'] == 'superadmin':
         return redirect(url_for('superadmin.superadmin_dashboard'))
@@ -104,6 +113,7 @@ def redirect_user_dashboard():
     else:
         return redirect(url_for('student.student_dashboard'))
 
+# Route pour le changement de mot de passe
 @main.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     if 'user_id' not in session:
@@ -135,11 +145,13 @@ def change_password():
 
     return render_template('change_password.html')
 
+# Route pour la déconnexion
 @main.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for(LOGIN_URL))
 
+# Route pour la page d'erreur 404
 @main.app_errorhandler(404)
 def page_not_found(e):
     return render_template('404error.html'), 404

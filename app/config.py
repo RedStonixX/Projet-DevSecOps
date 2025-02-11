@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement AVANT de les utiliser
 load_dotenv()
 
+# Configuration de l'application
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = (
@@ -17,7 +17,7 @@ class Config:
     SESSION_COOKIE_SECURE = True 
     SESSION_COOKIE_SAMESITE = 'Lax'
     SESSION_PERMANENT = True
-    PERMANENT_SESSION_LIFETIME = 1800  # En secondes (30 min)
+    PERMANENT_SESSION_LIFETIME = 1800
 
     # Protection Content Security Policy (CSP)
     CONTENT_SECURITY_POLICY = {

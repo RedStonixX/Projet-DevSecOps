@@ -6,6 +6,7 @@ prof_bp = Blueprint('prof', __name__)
 
 PROF_DASHBOARD = 'prof.prof_dashboard'
 
+# Vérifier si l'utilisateur est connecté et est un professeur
 @prof_bp.before_request
 def check_change_password():
     if 'user_id' in session:
@@ -13,6 +14,7 @@ def check_change_password():
         if user and user.change_password:
             return redirect(url_for('main.change_password'))
 
+# Route pour la page d'accueil du professeur
 @prof_bp.route('/prof_dashboard', methods=['GET', 'POST'])
 def prof_dashboard():
     if 'user_id' not in session or session['user_type'] != 'prof':
@@ -50,6 +52,7 @@ def prof_dashboard():
     
     return render_template('teacher.html', username=decrypt_username(prof.encrypted_nom_prof), matiere=matiere.nom_matiere, classes=classes, notes_par_eleve=notes_par_eleve, selected_classe=selected_classe, moyenne_generale=moyenne_generale)
 
+# Route pour l'ajout d'une note
 @prof_bp.route('/prof/add_note', methods=['POST'])
 def prof_add_note():
     eleve_id = request.form['eleve_id']
@@ -73,6 +76,7 @@ def prof_add_note():
     flash('Nouvelle note ajoutée avec succès')
     return redirect(url_for(PROF_DASHBOARD))
 
+# Route pour la modification d'une note
 @prof_bp.route('/prof/edit_note/<int:note_id>', methods=['POST'])
 def prof_edit_note(note_id):
     new_note_value = request.form['new_note_value']
@@ -92,6 +96,7 @@ def prof_edit_note(note_id):
         flash('Note modifiée avec succès')
     return redirect(url_for(PROF_DASHBOARD))
 
+# Route pour la suppression d'une note
 @prof_bp.route('/prof/delete_note/<int:note_id>', methods=['POST'])
 def prof_delete_note(note_id):
     note = Note.query.get(note_id)

@@ -1,3 +1,4 @@
+// Suppression d'un administrateur
 function deleteAdmin() {
     const adminId = document.getElementById('adminSelect').value;
     if (adminId) {
@@ -21,6 +22,7 @@ function deleteAdmin() {
     }
 }
 
+// Ajout d'un administrateur
 function addAdmin() {
     const adminName = document.getElementById('adminName').value;
     if (adminName) {
@@ -49,6 +51,7 @@ function addAdmin() {
     }
 }
 
+// Copie du mot de passe généré
 function copyPassword() {
     const passwordText = document.getElementById('newPasswordText').innerText;
     navigator.clipboard.writeText(passwordText).then(() => {

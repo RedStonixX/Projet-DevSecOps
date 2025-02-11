@@ -7,6 +7,7 @@ import random
 
 admin_bp = Blueprint('admin', __name__)
 
+# Vérifier si l'utilisateur est connecté et est un administrateur
 @admin_bp.before_request
 def check_change_password():
     if 'user_id' in session:
@@ -14,6 +15,7 @@ def check_change_password():
         if user and user.change_password:
             return redirect(url_for('main.change_password'))
 
+# Route pour la page d'accueil de l'administrateur
 @admin_bp.route('/admin_dashboard')
 def admin_dashboard():
     if 'user_id' not in session or session['user_type'] != 'admin':
@@ -46,6 +48,7 @@ def admin_dashboard():
     
     return render_template('admin.html', username=decrypt_username(admin.encrypted_nom_admin), admins=admins, profs=profs, eleves=eleves, classes=classes, matieres=matieres, alert_messages=alert_messages)
 
+# Route pour afficher les informations d'un professeur
 @admin_bp.route('/admin/prof_info/<int:prof_id>')
 def prof_info(prof_id):
     prof = Prof.query.get(prof_id)
@@ -56,6 +59,7 @@ def prof_info(prof_id):
     
     return jsonify(matiere=matiere, classes=class_names, all_classes=all_classes)
 
+# Route pour afficher les informations d'un élève
 @admin_bp.route('/admin/eleve_info/<int:eleve_id>')
 def eleve_info(eleve_id):
     eleve = Eleve.query.get(eleve_id)
@@ -77,6 +81,7 @@ def eleve_info(eleve_id):
     
     return jsonify(classe=classe, profs=prof_info, moyenne=float(moyenne_generale), notes=notes_par_matiere, notes_moyennes=notes_moyennes)
 
+# Route pour mettre à jour la classe d'un élève
 @admin_bp.route('/admin/update_eleve_classe', methods=['POST'])
 def update_eleve_classe():
     data = request.get_json()
@@ -89,6 +94,7 @@ def update_eleve_classe():
     
     return jsonify({'success': True})
 
+# Route pour mettre à jour la note d'un élève
 @admin_bp.route('/admin/edit_note', methods=['POST'])
 def edit_note():
     data = request.get_json()
@@ -111,6 +117,7 @@ def edit_note():
         return jsonify({'success': True})
     return jsonify({'success': False})
 
+# Route pour supprimer une note
 @admin_bp.route('/admin/delete_note', methods=['POST'])
 def delete_note():
     data = request.get_json()
@@ -127,6 +134,7 @@ def delete_note():
         return jsonify({'success': True})
     return jsonify({'success': False, 'message': 'Note non trouvée ou index invalide'}), 404
 
+# Route pour ajouter une note
 @admin_bp.route('/admin/add_note', methods=['POST'])
 def add_note():
     data = request.get_json()
@@ -148,12 +156,12 @@ def add_note():
     
     return jsonify({'success': True})
 
+# Route pour ajouter une classe
 @admin_bp.route('/admin/add_classe', methods=['POST'])
 def add_classe():
     data = request.get_json()
     nom_classe = data.get('nom_classe')
 
-    # Vérification si une classe avec le même nom existe déjà
     if Classe.query.filter_by(nom_classe=nom_classe).first():
         return jsonify({'success': False, 'message': 'Le nom de la classe existe déjà.'}), 400
 
@@ -163,45 +171,42 @@ def add_classe():
 
     return jsonify({'success': True})
 
+# Route pour supprimer une classe
 @admin_bp.route('/admin/delete_classe', methods=['POST'])
 def delete_classe():
     data = request.get_json()
     classe_id = data.get('id_classe')
     
-    # Supprimer la valeur id_classe des élèves
     Eleve.query.filter_by(id_classe=classe_id).update({'id_classe': None})
     
-    # Supprimer les lignes de la table ProfClasse
     ProfClasse.query.filter_by(id_classe=classe_id).delete()
     
-    # Supprimer la classe
     classe = Classe.query.get(classe_id)
     db.session.delete(classe)
     db.session.commit()
     
     return jsonify({'success': True})
 
+# Route pour supprimer un élève
 @admin_bp.route('/admin/delete_eleve', methods=['POST'])
 def delete_eleve():
     data = request.get_json()
     eleve_id = data.get('id_eleve')
     
-    # Supprimer les lignes de la table Notes
     Note.query.filter_by(id_eleve=eleve_id).delete()
     
-    # Supprimer l'élève
     eleve = Eleve.query.get(eleve_id)
     db.session.delete(eleve)
     db.session.commit()
     
     return jsonify({'success': True})
 
+# Route pour ajouter une matière
 @admin_bp.route('/admin/add_matiere', methods=['POST'])
 def add_matiere():
     data = request.get_json()
     nom_matiere = data.get('nom_matiere')
 
-    # Vérification si une matière avec le même nom existe déjà
     if Matiere.query.filter_by(nom_matiere=nom_matiere).first():
         return jsonify({'success': False, 'message': 'Le nom de la matière existe déjà.'}), 400
 
@@ -211,24 +216,23 @@ def add_matiere():
 
     return jsonify({'success': True})
 
+# Route pour supprimer une matière
 @admin_bp.route('/admin/delete_matiere', methods=['POST'])
 def delete_matiere():
     data = request.get_json()
     matiere_id = data.get('id_matiere')
     
-    # Supprimer les lignes de la table Notes
     Note.query.filter_by(id_matiere=matiere_id).delete()
     
-    # Supprimer la valeur id_matiere des profs
     Prof.query.filter_by(id_matiere=matiere_id).update({'id_matiere': None})
     
-    # Supprimer la matière
     matiere = Matiere.query.get(matiere_id)
     db.session.delete(matiere)
     db.session.commit()
     
     return jsonify({'success': True})
 
+# Route pour mettre à jour la matière d'un professeur
 @admin_bp.route('/admin/update_prof_matiere', methods=['POST'])
 def update_prof_matiere():
     data = request.get_json()
@@ -241,6 +245,7 @@ def update_prof_matiere():
     
     return jsonify({'success': True})
 
+# Route pour supprimer une classe d'un professeur
 @admin_bp.route('/admin/remove_class_from_prof', methods=['POST'])
 def remove_class_from_prof():
     data = request.get_json()
@@ -253,6 +258,7 @@ def remove_class_from_prof():
     
     return jsonify({'success': True})
 
+# Route pour ajouter une classe à un professeur
 @admin_bp.route('/admin/add_class_to_prof', methods=['POST'])
 def add_class_to_prof():
     data = request.get_json()
@@ -266,6 +272,7 @@ def add_class_to_prof():
     
     return jsonify({'success': True})
 
+# Route pour afficher les informations d'une classe
 @admin_bp.route('/admin/classe_info/<int:classe_id>')
 def classe_info(classe_id):
     profs = Prof.query.join(ProfClasse).filter(ProfClasse.id_classe == classe_id).all()
@@ -285,6 +292,7 @@ def classe_info(classe_id):
 
     return jsonify(profs=prof_info, moyennes_matieres=moyennes_matieres, moyenne_generale=moyenne_generale)
 
+# Route pour supprimer un professeur
 @admin_bp.route('/admin/delete_prof', methods=['POST'])
 def delete_prof():
     data = request.get_json()
@@ -292,15 +300,14 @@ def delete_prof():
     
     prof = Prof.query.get(prof_id)
     if prof:
-        # Supprimer les entrées dans la table ProfClasse
         ProfClasse.query.filter_by(id_prof=prof_id).delete()
-        # Supprimer le professeur
         db.session.delete(prof)
         db.session.commit()
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'message': 'Professeur non trouvé'}), 404
 
+# Route pour créer un professeur
 @admin_bp.route('/admin/create_prof', methods=['POST'])
 def create_prof():
     data = request.get_json()
@@ -319,6 +326,7 @@ def create_prof():
     
     return jsonify({'success': True, 'password': password})
 
+# Route pour créer un élève
 @admin_bp.route('/admin/create_eleve', methods=['POST'])
 def create_eleve():
     data = request.get_json()
@@ -337,6 +345,7 @@ def create_eleve():
     
     return jsonify({'success': True, 'password': password})
 
+# Route pour réinitialiser le mot de passe d'un élève
 @admin_bp.route('/admin/reset_eleve_password', methods=['POST'])
 def reset_eleve_password():
     data = request.get_json()
@@ -353,6 +362,7 @@ def reset_eleve_password():
     else:
         return jsonify({'success': False, 'message': 'Élève non trouvé'}), 404
 
+# Route pour réinitialiser le mot de passe d'un professeur
 @admin_bp.route('/admin/reset_prof_password', methods=['POST'])
 def reset_prof_password():
     data = request.get_json()
@@ -369,6 +379,7 @@ def reset_prof_password():
     else:
         return jsonify({'success': False, 'message': 'Professeur non trouvé'}), 404
 
+# Route pour vérifier la disponibilité d'une matière pour un professeur
 @admin_bp.route('/admin/check_matiere_availability/<int:matiere_id>/<int:prof_id>', methods=['GET'])
 def check_matiere_availability(matiere_id, prof_id):
     other_prof = Prof.query.filter(Prof.id_prof != prof_id, Prof.id_matiere == matiere_id).first()

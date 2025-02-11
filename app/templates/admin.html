@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <!--Div pour la barre de navigation-->
     <nav class="navbar navbar-expand-md">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Portail Administration</a>
@@ -59,7 +60,7 @@
             {% endif %}
         {% endwith %}
 
-        <!-- New Cards for Liste Élève, Liste Professeur, Liste Classe, Liste Matière -->
+        <!-- Cards for Liste Élève, Liste Professeur, Liste Classe, Liste Matière -->
         <div class="row mb-4">
             <div class="col-12 col-md-6 col-lg-6 col-xl-3 mb-4">
                 <div class="card">
@@ -198,30 +199,30 @@
         </div>
 
         <!-- Delete Prof Modal -->
-    <div class="modal fade" id="deleteProfModal" tabindex="-1" aria-labelledby="deleteProfModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteProfModalLabel">Supprimer un Professeur</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="deleteProfForm">
-                        <div class="mb-3">
-                            <label for="profSelectDelete" class="form-label">Sélectionnez un professeur</label>
-                            <select class="form-select" id="profSelectDelete">
-                                <option value="" disabled selected>Sélectionner un professeur</option>
-                                {% for prof in profs %}
-                                <option value="{{ prof.id_prof }}">{{ prof.nom_prof }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-danger" onclick="deleteProf()">Supprimer</button>
-                    </form>
+        <div class="modal fade" id="deleteProfModal" tabindex="-1" aria-labelledby="deleteProfModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteProfModalLabel">Supprimer un Professeur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deleteProfForm">
+                            <div class="mb-3">
+                                <label for="profSelectDelete" class="form-label">Sélectionnez un professeur</label>
+                                <select class="form-select" id="profSelectDelete">
+                                    <option value="" disabled selected>Sélectionner un professeur</option>
+                                    {% for prof in profs %}
+                                    <option value="{{ prof.id_prof }}">{{ prof.nom_prof }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="deleteProf()">Supprimer</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
         <!-- Edit Matiere Modal -->
         <div class="modal fade" id="editMatiereModal" tabindex="-1" aria-labelledby="editMatiereModalLabel" aria-hidden="true">
@@ -586,6 +587,7 @@
             </div>
         </div>
 
+        <!-- Cards for Classe Information -->
         <div class="row">
             <div class="col-md-6">
                 <div class="card mb-4">
@@ -615,7 +617,7 @@
         </div>
     </div>
 
-    <!-- Bouton flottant -->
+    <!-- Bouton créer un utilisateur -->
     <button class="btn btn-success btn-floating" id="floatingButton" onclick="openCreateUserModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
