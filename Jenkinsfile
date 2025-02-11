@@ -9,6 +9,16 @@ pipeline {
 
     stages {
 
+        stage('Cleanup') {
+            steps {
+                script {
+                    sh "sudo kill -9 \$(pgrep -f 'zap.sh') || true"
+                    sh "sudo kill -9 \$(pgrep -f '/opt/zaproxy/zap-2.16.0.jar') || true"
+                    sh "sudo kill -9 \$(cat flask.pid) || true"
+                }
+            }
+        }
+
         stage('Setup Environment') {
             steps {
                 sh '''
