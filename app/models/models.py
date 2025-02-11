@@ -2,38 +2,52 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-# Définition de la table Admin
+# Définition de la classe Admin
 class Admin(db.Model):
     __tablename__ = 'admins'
     id_admin = db.Column(db.Integer, primary_key=True)
+    nom_admin = db.Column(db.String(255), nullable=False)
     encrypted_nom_admin = db.Column(db.String(255), nullable=False)
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
     is_super_admin = db.Column(db.Boolean, default=False)
 
-# Définition de la table Classe
+    def __repr__(self):
+        return f'<Admin {self.nom_admin}>'
+
+# Définition de la classe Classe
 class Classe(db.Model):
     __tablename__ = 'classes'
     id_classe = db.Column(db.Integer, primary_key=True)
     nom_classe = db.Column(db.String(50), nullable=False)
     eleves = db.relationship('Eleve', backref='classe', lazy=True)
 
-# Définition de la table Eleve
+    def __repr__(self):
+        return f'<Classe {self.nom_classe}>'
+
+# Définition de la classe Eleve
 class Eleve(db.Model):
     __tablename__ = 'eleves'
     id_eleve = db.Column(db.Integer, primary_key=True)
+    nom_eleve = db.Column(db.String(100), nullable=False)
     encrypted_nom_eleve = db.Column(db.String(255), nullable=False)
     id_classe = db.Column(db.Integer, db.ForeignKey('classes.id_classe'))
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
 
-# Définition de la table Matiere
+    def __repr__(self):
+        return f'<Eleve {self.nom_eleve}>'
+
+# Définition de la classe Matiere
 class Matiere(db.Model):
     __tablename__ = 'matieres'
     id_matiere = db.Column(db.Integer, primary_key=True)
     nom_matiere = db.Column(db.String(50), nullable=False)
 
-# Définition de la table Note
+    def __repr__(self):
+        return f'<Matiere {self.nom_matiere}>'
+
+# Définition de la classe Note
 class Note(db.Model):
     __tablename__ = 'notes'
     id_note = db.Column(db.Integer, primary_key=True)
@@ -44,19 +58,26 @@ class Note(db.Model):
     eleve = db.relationship('Eleve', backref='notes', lazy=True)
     matiere = db.relationship('Matiere', backref='notes', lazy=True)
 
-# Définition de la table Prof
+    def __repr__(self):
+        return f'<Note {self.note} - Élève {self.id_eleve} - Matière {self.id_matiere}>'
+
+# Définition de la classe Prof
 class Prof(db.Model):
     __tablename__ = 'profs'
     id_prof = db.Column(db.Integer, primary_key=True)
+    nom_prof = db.Column(db.String(100), nullable=False)
     encrypted_nom_prof = db.Column(db.String(255), nullable=False)
     id_matiere = db.Column(db.Integer, db.ForeignKey('matieres.id_matiere'))
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f'<Prof {self.nom_prof}>'
     
     def has_classes(self):
         return ProfClasse.query.filter_by(id_prof=self.id_prof).count() > 0
 
-# Définition de la table ProfClasse
+# Définition de la classe ProfClasse
 class ProfClasse(db.Model):
     __tablename__ = 'profclasse'
     id_prof = db.Column(db.Integer, db.ForeignKey('profs.id_prof'), primary_key=True)
