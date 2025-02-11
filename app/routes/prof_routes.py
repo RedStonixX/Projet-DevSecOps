@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app.models.models import Classe, Prof, Eleve, Note, Matiere, ProfClasse, db
 from app.encryption import encrypt_username, decrypt_username
 
@@ -54,6 +54,15 @@ def prof_dashboard():
 def prof_add_note():
     eleve_id = request.form['eleve_id']
     new_note_value = request.form['new_note_value']
+    
+    try:
+        new_note_value = float(new_note_value)
+        if new_note_value < 0 or new_note_value > 20:
+            raise ValueError("La note doit être comprise entre 0 et 20.")
+    except ValueError as e:
+        flash(str(e), 'error')
+        return redirect(url_for(PROF_DASHBOARD))
+    
     new_note = Note(
         id_eleve=eleve_id,
         id_matiere=session['user_id'],
@@ -67,6 +76,15 @@ def prof_add_note():
 @prof_bp.route('/prof/edit_note/<int:note_id>', methods=['POST'])
 def prof_edit_note(note_id):
     new_note_value = request.form['new_note_value']
+    
+    try:
+        new_note_value = float(new_note_value)
+        if new_note_value < 0 or new_note_value > 20:
+            raise ValueError("La note doit être comprise entre 0 et 20.")
+    except ValueError as e:
+        flash(str(e), 'error')
+        return redirect(url_for(PROF_DASHBOARD))
+    
     note = Note.query.get(note_id)
     if note:
         note.note = new_note_value

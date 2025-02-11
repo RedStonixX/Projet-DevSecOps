@@ -123,17 +123,18 @@
                                     </ul>
                                     <hr>
                                     <h5>Ajouter une nouvelle note</h5>
-                                    <form id="addNoteForm" method="POST" action="{{ url_for('prof.prof_add_note') }}">
+                                    <form id="addNoteForm" method="POST" action="{{ url_for('prof.prof_add_note') }}" onsubmit="return validateAddNoteForm()">
                                         <input type="hidden" name="eleve_id" value="{{ details.eleve_id }}">
                                         <div class="mb-3">
                                             <label for="newNoteValue" class="form-label">Nouvelle note</label>
-                                            <input type="text" class="form-control" name="new_note_value" required>
+                                            <input type="text" class="form-control" id="newNoteValue" name="new_note_value" required>
                                         </div>
-                                        <button type="submit" class="btn btn-primary">Ajouter la note</button>
+                                        <button type="submit" class="btn btn-success">Ajouter la note</button>
                                     </form>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fermer</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
+                                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
                                 </div>
                             </div>
                         </div>
@@ -153,7 +154,7 @@
                     <h5 class="modal-title" id="editNoteModalLabel">Modifier la note</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="editNoteForm" method="POST">
+                <form id="editNoteForm" method="POST" onsubmit="return validateEditNoteForm()">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="newNoteValue" class="form-label">Nouvelle note</label>
@@ -182,6 +183,7 @@
             editNoteModal.show();
         }
     </script>
+    <script src="{{ url_for('static', filename='js/teacher.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
