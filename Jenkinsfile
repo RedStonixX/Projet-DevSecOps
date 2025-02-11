@@ -66,7 +66,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    python /var/jenkins_home/convert_zap_to_sarif.py $REPORT_DIR/zap_report.json $REPORT_DIR/zap_report.sarif
+                    python3 /var/jenkins_home/convert_zap_to_sarif.py $REPORT_DIR/zap_report.json $REPORT_DIR/zap_report.sarif
                     """
                 }
             }
