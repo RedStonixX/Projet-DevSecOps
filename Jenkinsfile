@@ -41,8 +41,7 @@ pipeline {
                             -Dsonar.sources=. \
                             -Dsonar.python.version=3.13 \
                             -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.token=$SONAR_AUTH_TOKEN \
-                            -Dsonar.externalIssuesReportPaths=$REPORT_DIR/zap_report.sarif
+                            -Dsonar.token=$SONAR_AUTH_TOKEN
                         """
                     }
                 }
