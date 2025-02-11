@@ -125,8 +125,8 @@ def change_password():
         user_type = session['user_type']
 
         # Validation du mot de passe
-        if not re.match(r'^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])(?=.{8,})', new_password):
-            flash('Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.', 'danger')
+        if not re.match(r'^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])(?=.{8,})', new_password):
+            flash('Le mot de passe doit contenir au moins 8 caractères, un chiffre, une majuscule et un caractère spécial.', 'danger')
             return redirect(url_for('main.change_password'))
 
         if user_type == 'admin':
