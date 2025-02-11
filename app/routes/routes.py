@@ -92,19 +92,21 @@ def is_user_configured(user):
 def set_user_session(user):
     if isinstance(user, Admin):
         session['user_id'] = user.id_admin
+        if user.is_super_admin:
+            session['user_type'] = 'superadmin'
+        else:
+            session['user_type'] = 'admin'
     elif isinstance(user, Prof):
         session['user_id'] = user.id_prof
-    else:
-        session['user_id'] = user.id_eleve
-    if isinstance(user, Admin):
-        session['user_type'] = 'admin'
-    elif isinstance(user, Prof):
         session['user_type'] = 'prof'
     else:
+        session['user_id'] = user.id_eleve
         session['user_type'] = 'eleve'
 
 def redirect_user_dashboard():
-    if session['user_type'] == 'admin':
+    if session['user_type'] == 'superadmin':
+        return redirect(url_for('superadmin.superadmin_dashboard'))
+    elif session['user_type'] == 'admin':
         return redirect(url_for('admin.admin_dashboard'))
     elif session['user_type'] == 'prof':
         return redirect(url_for('prof.prof_dashboard'))

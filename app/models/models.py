@@ -9,6 +9,7 @@ class Admin(db.Model):
     encrypted_nom_admin = db.Column(db.String(255), nullable=False)  # Nouvelle colonne
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
+    is_super_admin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'<Admin {self.nom_admin}>'
