@@ -77,9 +77,6 @@ pipeline {
                             }]
                         }]
                         }' $REPORT_DIR/zap_report.json > $REPORT_DIR/zap_report.sarif
-                    
-                    jq '.' zap-reports/zap_report.sarif
-                    head -n 50 zap-reports/zap_report.sarif
                     """
                 }
             }
