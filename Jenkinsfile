@@ -9,16 +9,6 @@ pipeline {
 
     stages {
 
-        stage('Cleanupg') {
-            steps {
-                script {
-                    sh "sudo kill -9 \$(pgrep -f 'zap.sh') || true"
-                    sh "sudo kill -9 \$(pgrep -f '/opt/zaproxy/zap-2.16.0.jar') || true"
-                    sh "sudo kill -9 \$(cat flask.pid) || true"
-                }
-            }
-        }
-
         stage('Setup Environment') {
             steps {
                 sh '''
@@ -36,39 +26,6 @@ pipeline {
                 . .venv/bin/activate
                 python run.py & echo $! > flask.pid && sleep 10 && curl -I $TARGET_URL || { echo "Flask did not start correctly, stopping pipeline."; exit 1; }
                 '''
-            }
-        }
-
-        stage('Run OWASP ZAP Scan') {
-            steps {
-                script {
-                    sh """
-                    mkdir -p $REPORT_DIR
-                    sudo $ZAP_PATH -daemon -config api.disablekey=true &
-                    sleep 15  # Laisser ZAP démarrer
-
-                    sudo zap-cli --zap-url http://localhost open-url $TARGET_URL
-
-                    # Lancer un scan automatique
-                    sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
-
-                    # # Générer un rapport
-                    curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
-
-                    # Convertir le rapport en format SARIF
-                    cat $REPORT_DIR/zap_report.json
-                    """
-                }
-            }
-        }
-
-        stage('Convert ZAP Report to SARIF') {
-            steps {
-                script {
-                    sh """
-                    python3 /var/jenkins_home/convert_zap_to_sarif.py
-                    """
-                }
             }
         }
 
@@ -115,6 +72,26 @@ pipeline {
                     } else {
                         error "Le fichier requirements.txt est manquant. Impossible d'analyser les dépendances Python."
                     }
+                }
+            }
+        }
+
+        stage('Run OWASP ZAP Scan') {
+            steps {
+                script {
+                    sh """
+                    mkdir -p $REPORT_DIR
+                    sudo $ZAP_PATH -daemon -config api.disablekey=true &
+                    sleep 15  # Laisser ZAP démarrer
+
+                    sudo zap-cli --zap-url http://localhost open-url $TARGET_URL
+
+                    # Lancer un scan automatique
+                    sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
+
+                    # # Générer un rapport
+                    curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
+                    """
                 }
             }
         }
