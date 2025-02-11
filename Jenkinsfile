@@ -48,24 +48,36 @@ pipeline {
                     # Convertir le rapport en format SARIF
                     #cat $REPORT_DIR/zap_report.json
                     jq '{
-                        runs: [{
-                            tool: {
-                                driver: {
-                                    name: "OWASP ZAP",
-                                    rules: [.alerts[]? | { id: .pluginId, shortDescription: .name, fullDescription: .desc }]
+                        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+                        "version": "2.1.0",
+                        "runs": [{
+                            "tool": {
+                            "driver": {
+                                "name": "OWASP ZAP",
+                                "rules": [.alerts[]? | {
+                                "id": .pluginId,
+                                "name": .name,
+                                "shortDescription": { "text": .name },
+                                "fullDescription": { "text": .desc },
+                                "helpUri": .reference,
+                                "properties": {
+                                    "severity": .riskdesc
                                 }
-                            },
-                            results: [.alerts[]? | {
-                                ruleId: .pluginId,
-                                message: .desc,
-                                locations: [{
-                                    physicalLocation: {
-                                    artifactLocation: { uri: .url }
-                                    }
                                 }]
+                            }
+                            },
+                            "results": [.alerts[]? | {
+                            "ruleId": .pluginId,
+                            "message": { "text": .desc },
+                            "locations": [{
+                                "physicalLocation": {
+                                "artifactLocation": { "uri": .url }
+                                }
+                            }]
                             }]
                         }]
-                    }' $REPORT_DIR/zap_report.json > $REPORT_DIR/zap_report.sarif
+                        }' zap-reports/zap_report.json > zap-reports/zap_report.sarif
+
                     """
                 }
             }
