@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session
 from app.models.models import Classe, Eleve, Note, Matiere, Prof
-from app.encryption import encrypt_username, decrypt_username
+from app.encryption import decrypt_username
 
 student_bp = Blueprint('student', __name__)
 

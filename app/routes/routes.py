@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, redirect, url_for, flash, session
 from app.models.models import Admin, Prof, Eleve, db
-from app.encryption import encrypt_username, decrypt_username
+from app.encryption import encrypt_username
 import datetime
 import hashlib
 import re
@@ -68,16 +68,6 @@ def find_user_by_encrypted_username(encrypted_username):
     user = Admin.query.filter_by(encrypted_nom_admin=encrypted_username).first() or \
            Prof.query.filter_by(encrypted_nom_prof=encrypted_username).first() or \
            Eleve.query.filter_by(encrypted_nom_eleve=encrypted_username).first()
-    if user:
-        if isinstance(user, Admin):
-            user_name = user.nom_admin
-        elif isinstance(user, Prof):
-            user_name = user.nom_prof
-        else:
-            user_name = user.nom_eleve
-        print(f"Utilisateur trouvé: {user_name}")
-    else:
-        print("Utilisateur non trouvé")
     return user
 
 def is_user_configured(user):

@@ -6,7 +6,7 @@ class Admin(db.Model):
     __tablename__ = 'admins'
     id_admin = db.Column(db.Integer, primary_key=True)
     nom_admin = db.Column(db.String(255), nullable=False)
-    encrypted_nom_admin = db.Column(db.String(255), nullable=False)  # Nouvelle colonne
+    encrypted_nom_admin = db.Column(db.String(255), nullable=False)
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
     is_super_admin = db.Column(db.Boolean, default=False)
@@ -27,7 +27,7 @@ class Eleve(db.Model):
     __tablename__ = 'eleves'
     id_eleve = db.Column(db.Integer, primary_key=True)
     nom_eleve = db.Column(db.String(100), nullable=False)
-    encrypted_nom_eleve = db.Column(db.String(255), nullable=False)  # Nouvelle colonne
+    encrypted_nom_eleve = db.Column(db.String(255), nullable=False)
     id_classe = db.Column(db.Integer, db.ForeignKey('classes.id_classe'))
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)
@@ -60,7 +60,7 @@ class Prof(db.Model):
     __tablename__ = 'profs'
     id_prof = db.Column(db.Integer, primary_key=True)
     nom_prof = db.Column(db.String(100), nullable=False)
-    encrypted_nom_prof = db.Column(db.String(255), nullable=False)  # Nouvelle colonne
+    encrypted_nom_prof = db.Column(db.String(255), nullable=False)
     id_matiere = db.Column(db.Integer, db.ForeignKey('matieres.id_matiere'))
     hash_password = db.Column(db.String(64), nullable=False)
     change_password = db.Column(db.Boolean, default=True)

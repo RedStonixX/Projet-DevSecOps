@@ -3,7 +3,7 @@ import string
 from flask import Blueprint, render_template, session, redirect, url_for, jsonify, request
 from app.models.models import Admin, db
 from app.routes.routes import hash_password
-from app.encryption import encrypt_username, decrypt_username
+from app.encryption import encrypt_username
 
 superadmin_bp = Blueprint('superadmin', __name__)
 
