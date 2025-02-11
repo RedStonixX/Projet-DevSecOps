@@ -86,14 +86,10 @@ pipeline {
                     sudo zap-cli --zap-url http://localhost open-url $TARGET_URL
 
                     # Lancer un scan automatique
-                    curl "http://localhost:8090/JSON/ascan/action/scan/?url=$TARGET_URL&recurse=true&inScopeOnly=true&scanPolicyName=Default&method=GET&postData=&contextId="
+                    sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
 
-                    # Attendre la fin du scan
-                    while [[ \$(curl -s http://localhost:8090/JSON/ascan/view/status | jq -r '.status') != "100" ]]; do
-                        sleep 10
-                    done
                     # # Générer un rapport
-                    sudo zap-cli --zap-url http://localhost report -o $REPORT_DIR/zap_report.json -f json
+                    curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
                     """
                 }
             }
@@ -102,7 +98,7 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 script {
-                    archiveArtifacts artifacts: "$REPORT_DIR/zap_report.html", allowEmptyArchive: true
+                    archiveArtifacts artifacts: "$REPORT_DIR/zap_report.json", allowEmptyArchive: true
                     archiveArtifacts artifacts: "dependency-check-report/*", allowEmptyArchive: true
                 }
             }
