@@ -52,6 +52,16 @@ pipeline {
             }
         }
 
+        stage('Convert ZAP Report to SARIF') {
+            steps {
+                script {
+                    sh """
+                    python /var/jenkins_home/convert_zap_to_sarif.py $REPORT_DIR/zap_report.json $REPORT_DIR/zap_report.sarif
+                    """
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
