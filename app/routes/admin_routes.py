@@ -301,24 +301,6 @@ def delete_prof():
     else:
         return jsonify({'success': False, 'message': 'Professeur non trouvé'}), 404
 
-@admin_bp.route('/admin/create_admin', methods=['POST'])
-def create_admin():
-    data = request.get_json()
-    nom_admin = data.get('nom_admin')
-    
-    if Admin.query.filter_by(nom_admin=nom_admin).first():
-        return jsonify({'success': False, 'message': 'Le nom de l\'admin existe déjà.'}), 400
-    
-    password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-    hashed_password = hash_password(password)
-    encrypted_nom_admin = encrypt_username(nom_admin)  # Chiffrer le nom d'utilisateur
-    
-    new_admin = Admin(nom_admin=nom_admin, encrypted_nom_admin=encrypted_nom_admin, hash_password=hashed_password, change_password=True)
-    db.session.add(new_admin)
-    db.session.commit()
-    
-    return jsonify({'success': True, 'password': password})
-
 @admin_bp.route('/admin/create_prof', methods=['POST'])
 def create_prof():
     data = request.get_json()
