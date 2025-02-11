@@ -7,7 +7,8 @@ from app.routes.prof_routes import prof_bp
 from app.routes.student_routes import student_bp
 from .routes.student_routes import student_bp
 from .routes.superadmin_routes import superadmin_bp
-    
+
+# Création de l'application
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)

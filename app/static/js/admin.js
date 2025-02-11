@@ -1,3 +1,4 @@
+// Affiche les informations des professeurs
 function displayProfInfo() {
     const profSelect = document.getElementById('profSelect');
     const profId = profSelect.value;
@@ -23,6 +24,7 @@ function displayProfInfo() {
     }
 }
 
+// Affiche les informations des élèves
 function displayEleveInfo() {
     const eleveSelect = document.getElementById('eleveSelect');
     const eleveId = eleveSelect.value;
@@ -50,6 +52,7 @@ function displayEleveInfo() {
     }
 }
 
+// Affiche les notes des élèves
 function displayEleveNotes() {
     const eleveSelect = document.getElementById('eleveSelect');
     const eleveId = eleveSelect.value;
@@ -82,6 +85,7 @@ let currentEleveId;
 let currentMatiere;
 let currentNoteIndex;
 
+// Met à jour la sélection de la classe lors de la modification d'un élève
 function updateClasseSelect() {
     const eleveSelect = document.getElementById('eleveSelectModal');
     const classeSelectContainer = document.getElementById('classeSelectContainer');
@@ -90,11 +94,9 @@ function updateClasseSelect() {
     const selectedEleve = eleveSelect.options[eleveSelect.selectedIndex];
     const classeId = selectedEleve.getAttribute('data-classe');
 
-    // Afficher le conteneur de sélection de la classe et le bouton "Afficher les notes"
     classeSelectContainer.style.display = 'block';
     showNotesButton.style.display = 'block';
 
-    // Mettre à jour la sélection de la classe
     for (let i = 0; i < classeSelect.options.length; i++) {
         if (classeSelect.options[i].value == classeId) {
             classeSelect.selectedIndex = i;
@@ -105,6 +107,7 @@ function updateClasseSelect() {
     }
 }
 
+// Met à jour la matière d'un professeur
 function saveProfChanges() {
     const profId = document.getElementById('profSelectModal').value;
     const matiereId = document.getElementById('matiereSelectModal').value;
@@ -131,6 +134,7 @@ function saveProfChanges() {
     });
 }
 
+// Met à jour la classe d'un élève
 function saveEleveChanges() {
     const eleveId = document.getElementById('eleveSelectModal').value;
     const classeId = document.getElementById('classeSelectModal').value;
@@ -153,6 +157,7 @@ function saveEleveChanges() {
     });
 }
 
+// Affiche les notes d'un élève
 function showEleveNotes() {
     const eleveId = document.getElementById('eleveSelectModal').value;
     if (!eleveId) {
@@ -184,6 +189,7 @@ function showEleveNotes() {
         });
 }
 
+// Affiche les notes d'une matière pour un élève
 function displayMatiereNotes() {
     const matiereSelect = document.getElementById('matiereSelect');
     const selectedMatiere = matiereSelect.value;
@@ -210,6 +216,7 @@ function displayMatiereNotes() {
         });
 }
 
+// Ouvre la modal de modification d'une note
 function openEditEleveModal(eleveId) {
     const eleveSelectModal = document.getElementById('eleveSelectModal');
     eleveSelectModal.value = eleveId;
@@ -218,6 +225,7 @@ function openEditEleveModal(eleveId) {
     editEleveModal.show();
 }
 
+// Ouverture de la modal de modification d'un professeur
 function openEditProfModal(profId) {
     const profSelectModal = document.getElementById('profSelectModal');
     profSelectModal.value = profId;
@@ -226,6 +234,7 @@ function openEditProfModal(profId) {
     editProfModal.show();
 }
 
+// Ouvre la modal de modification d'une note
 function openEditNoteModal(eleveId, matiere, noteIndex, note) {
     currentEleveId = eleveId;
     currentMatiere = matiere;
@@ -235,6 +244,7 @@ function openEditNoteModal(eleveId, matiere, noteIndex, note) {
     editNoteModal.show();
 }
 
+// Enregistre les modifications d'une note
 function saveNoteChanges() {
     const newNote = document.getElementById('editNoteInput').value;
     fetch('/admin/edit_note', {
@@ -257,6 +267,7 @@ function saveNoteChanges() {
     });
 }
 
+// Supprime une note
 function deleteNote(eleveId, matiere, noteIndex) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
         fetch('/admin/delete_note', {
@@ -283,6 +294,7 @@ function deleteNote(eleveId, matiere, noteIndex) {
     }
 }
 
+// Ajoute une note
 function addNote() {
     const newNote = document.getElementById('newNoteInput').value;
     const eleveId = document.getElementById('eleveSelectModal').value;
@@ -312,6 +324,7 @@ function addNote() {
     });
 }
 
+// Ajoute une classe
 function addClasse() {
     const classeNameInput = document.getElementById('classeNameInput').value;
 
@@ -338,6 +351,7 @@ function addClasse() {
     });
 }
 
+// Supprime une classe
 function deleteClasse() {
     const classeId = document.getElementById('classeSelectDelete').value;
 
@@ -364,6 +378,7 @@ function deleteClasse() {
     });
 }
 
+// Supprime un élève
 function deleteEleve() {
     const eleveId = document.getElementById('eleveSelectDelete').value;
 
@@ -390,6 +405,7 @@ function deleteEleve() {
     });
 }
 
+// Ajoute une matière
 function addMatiere() {
     const matiereNameInput = document.getElementById('matiereNameInput').value;
 
@@ -416,6 +432,7 @@ function addMatiere() {
     });
 }
 
+// Supprime une matière
 function deleteMatiere() {
     const matiereId = document.getElementById('matiereSelectDelete').value;
 
@@ -442,6 +459,7 @@ function deleteMatiere() {
     });
 }
 
+// Met à jour la sélection de la matière lors de la modification d'un professeur
 function updateMatiereAndClassesSelect() {
     const profSelect = document.getElementById('profSelectModal');
     const matiereSelectContainer = document.getElementById('matiereSelectContainer');
@@ -454,12 +472,10 @@ function updateMatiereAndClassesSelect() {
     const matiereId = selectedProf.getAttribute('data-matiere');
     const profId = selectedProf.value;
 
-    // Afficher les conteneurs
     matiereSelectContainer.style.display = 'block';
     classesSelectContainer.style.display = 'block';
     addClassSelectContainer.style.display = 'block';
 
-    // Mettre à jour la sélection de la matière
     for (let i = 0; i < matiereSelect.options.length; i++) {
         if (matiereSelect.options[i].value == matiereId) {
             matiereSelect.selectedIndex = i;
@@ -496,6 +512,7 @@ function updateMatiereAndClassesSelect() {
         });
 }
 
+// Supprime une classe d'un professeur
 function removeClassFromProf(profId, className) {
     fetch('/admin/remove_class_from_prof', {
         method: 'POST',
@@ -515,6 +532,7 @@ function removeClassFromProf(profId, className) {
     });
 }
 
+// Vérifie la disponibilité d'une matière pour un professeur
 function checkMatiereAvailability() {
     const matiereSelect = document.getElementById('matiereSelectModal');
     const selectedMatiereId = matiereSelect.value;
@@ -534,6 +552,7 @@ function checkMatiereAvailability() {
         });
 }
 
+// Ajoute une classe à un professeur
 function addClassToProf() {
     const profId = document.getElementById('profSelectModal').value;
     const className = document.getElementById('addClassSelectModal').value;
@@ -560,6 +579,7 @@ function addClassToProf() {
     });
 }
 
+// Affiche les informations d'une classe
 function displayClasseInfo() {
     const classeId = document.getElementById('classeSelect').value;
     const classeInfo = document.getElementById('classeInfo');
@@ -595,6 +615,7 @@ function displayClasseInfo() {
         });
 }
 
+// Supprime un professeur
 function deleteProf() {
     const profId = document.getElementById('profSelectDelete').value;
 
@@ -616,17 +637,20 @@ function deleteProf() {
     });
 }
 
+// Ouvre la modal de création d'un utilisateur
 function openCreateUserModal() {
     const createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
     createUserModal.show();
 }
 
+// Met à jour le formulaire de création d'utilisateur
 function updateUserForm() {
     const userType = document.getElementById('userTypeSelect').value;
     document.getElementById('profForm').style.display = userType === 'prof' ? 'block' : 'none';
     document.getElementById('eleveForm').style.display = userType === 'eleve' ? 'block' : 'none';
 }
 
+// Crée un utilisateur
 function createUser() {
     const userType = document.getElementById('userTypeSelect').value;
     let url = '';
@@ -666,6 +690,7 @@ function createUser() {
     });
 }
 
+// Réinitialise le mot de passe d'un élève
 function resetElevePassword() {
     const eleveId = document.getElementById('eleveSelectModal').value;
 
@@ -693,6 +718,7 @@ function resetElevePassword() {
     });
 }
 
+// Réinitialise le mot de passe d'un professeur
 function resetProfPassword() {
     const profId = document.getElementById('profSelectModal').value;
 
@@ -720,6 +746,7 @@ function resetProfPassword() {
     });
 }
 
+// Copie le mot de passe généré
 function copyPassword() {
     const passwordText = document.getElementById('newPasswordText').innerText.replace('Nouveau mot de passe : ', '');
     navigator.clipboard.writeText(passwordText).then(() => {
@@ -731,6 +758,7 @@ function copyPassword() {
     });
 }
 
+// Vérification que les notes entrées par l'utilisateur sont correctes
 function validateNoteInput(noteInput) {
     const noteValue = parseFloat(noteInput.value);
     if (isNaN(noteValue) || noteValue < 0 || noteValue > 20) {
@@ -740,11 +768,13 @@ function validateNoteInput(noteInput) {
     return true;
 }
 
+// Vérification que le formulaire d'ajout de note est correct
 function validateAddNoteForm() {
     const noteInput = document.getElementById('newNoteValue');
     return validateNoteInput(noteInput);
 }
 
+// Vérification que le formulaire de modification de note est correct
 function validateEditNoteForm() {
     const noteInput = document.getElementById('editNoteValue');
     return validateNoteInput(noteInput);

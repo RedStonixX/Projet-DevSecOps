@@ -1,3 +1,4 @@
+// Script dédié au fond d'écran de la page de connexion
 var i = 0;
 var a3 = $('#a3');
 var a4 = $('#a4');

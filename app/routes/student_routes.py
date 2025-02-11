@@ -4,6 +4,7 @@ from app.encryption import decrypt_username
 
 student_bp = Blueprint('student', __name__)
 
+# Vérifier si l'élève doit changer son mot de passe
 @student_bp.before_request
 def check_change_password():
     if 'user_id' in session:
@@ -11,6 +12,7 @@ def check_change_password():
         if user and user.change_password:
             return redirect(url_for('main.change_password'))
 
+# Route pour la page d'accueil de l'élève
 @student_bp.route('/student_dashboard')
 def student_dashboard():
     if 'user_id' not in session or session['user_type'] != 'eleve':
@@ -43,7 +45,7 @@ def student_dashboard():
     for matiere, details in notes_par_matiere.items():
         details['moyenne'] = sum(details['notes']) / len(details['notes'])
     
-    # Calculate class average
+    
     class_notes = Note.query.join(Eleve).filter(Eleve.id_classe == eleve.id_classe).all()
     total_class_notes = sum(note.note for note in class_notes)
     total_class_count = len(class_notes)

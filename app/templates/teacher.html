@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <!--Div pour la barre de navigation-->
     <nav class="navbar navbar-expand-md">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Portail enseignant</a>
@@ -175,6 +176,7 @@
     </footer>
     
     <script>
+        // Ouverture du modal de modification de note
         function openEditModal(noteId, noteValue) {
             const editNoteForm = document.getElementById('editNoteForm');
             editNoteForm.action = `{{ url_for('prof.prof_edit_note', note_id=0) }}`.replace('0', noteId);

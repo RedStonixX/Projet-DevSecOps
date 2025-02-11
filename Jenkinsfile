@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+    // Définition des variables d'environnement
     environment {
         ZAP_PATH = "/opt/zaproxy/zap.sh"
         REPORT_DIR = "zap-reports"
@@ -9,6 +10,7 @@ pipeline {
 
     stages {
 
+        // Initialisation de l'environnement et installation des dépendances
         stage('Setup Environment') {
             steps {
                 sh '''
@@ -20,6 +22,7 @@ pipeline {
             }
         }
 
+        // Lancement de l'application
         stage('Run Flask App') {
             steps {
                 sh '''
@@ -29,6 +32,7 @@ pipeline {
             }
         }
 
+        // Analyse de code avec SonarQube
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
@@ -48,6 +52,7 @@ pipeline {
             }
         }
 
+        // Analyse des dépendances avec Dependency Check
         stage('Dependency Check') {
             steps {
                 script {
@@ -75,6 +80,7 @@ pipeline {
             }
         }
 
+        // Lancement du scan OWASP ZAP
         stage('Run OWASP ZAP Scan') {
             steps {
                 script {
@@ -95,6 +101,7 @@ pipeline {
             }
         }
 
+        // Archivage des rapports
         stage('Archive Artifacts') {
             steps {
                 script {
@@ -104,6 +111,7 @@ pipeline {
             }
         }
 
+        // Nettoyage de l'environnement
         stage('Cleanup') {
             steps {
                 script {
