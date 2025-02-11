@@ -46,37 +46,7 @@ pipeline {
                     curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
 
                     # Convertir le rapport en format SARIF
-                    #cat $REPORT_DIR/zap_report.json
-                    jq -n --argfile zap zap-reports/zap_report.json '{
-                        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-                        "version": "2.1.0",
-                        "runs": [{
-                            "tool": {
-                            "driver": {
-                                "name": "OWASP ZAP",
-                                "rules": ($zap.alerts | map({
-                                "id": .pluginId,
-                                "name": .name,
-                                "shortDescription": { "text": .name },
-                                "fullDescription": { "text": .desc },
-                                "helpUri": .reference,
-                                "properties": {
-                                    "severity": .riskdesc
-                                }
-                                }) // [])
-                            }
-                            },
-                            "results": ($zap.alerts | map({
-                            "ruleId": .pluginId,
-                            "message": { "text": .desc },
-                            "locations": [{
-                                "physicalLocation": {
-                                "artifactLocation": { "uri": .url }
-                                }
-                            }]
-                            }) // [])
-                        }]
-                        }' > zap-reports/zap_report.sarif
+                    cat $REPORT_DIR/zap_report.json
                     """
                 }
             }
