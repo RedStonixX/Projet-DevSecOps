@@ -9,7 +9,7 @@ pipeline {
 
     stages {
 
-        stage('Cleanup') {
+        stage('Cleanupg') {
             steps {
                 script {
                     sh "sudo kill -9 \$(pgrep -f 'zap.sh') || true"
