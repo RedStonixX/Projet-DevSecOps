@@ -47,14 +47,14 @@ pipeline {
 
                     # Convertir le rapport en format SARIF
                     #cat $REPORT_DIR/zap_report.json
-                    jq '{
+                    jq -n --argfile zap zap-reports/zap_report.json '{
                         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
                         "version": "2.1.0",
                         "runs": [{
                             "tool": {
                             "driver": {
                                 "name": "OWASP ZAP",
-                                "rules": [.alerts[]? | {
+                                "rules": ($zap.alerts[]? | {
                                 "id": .pluginId,
                                 "name": .name,
                                 "shortDescription": { "text": .name },
@@ -63,10 +63,10 @@ pipeline {
                                 "properties": {
                                     "severity": .riskdesc
                                 }
-                                }]
+                                })
                             }
                             },
-                            "results": [.alerts[]? | {
+                            "results": ($zap.alerts[]? | {
                             "ruleId": .pluginId,
                             "message": { "text": .desc },
                             "locations": [{
@@ -74,9 +74,9 @@ pipeline {
                                 "artifactLocation": { "uri": .url }
                                 }
                             }]
-                            }]
+                            })
                         }]
-                        }' zap-reports/zap_report.json > zap-reports/zap_report.sarif
+                        }' > zap-reports/zap_report.sarif
 
                     """
                 }
