@@ -29,6 +29,29 @@ pipeline {
             }
         }
 
+        stage('Run OWASP ZAP Scan') {
+            steps {
+                script {
+                    sh """
+                    mkdir -p $REPORT_DIR
+                    sudo $ZAP_PATH -daemon -config api.disablekey=true &
+                    sleep 15  # Laisser ZAP démarrer
+
+                    sudo zap-cli --zap-url http://localhost open-url $TARGET_URL
+
+                    # Lancer un scan automatique
+                    sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
+
+                    # # Générer un rapport
+                    curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
+
+                    # Convertir le rapport en format SARIF
+                    jq '.site[] | {runs: [{tool: {driver: {name: "OWASP ZAP", rules: (.alerts[] | {id: .pluginId, shortDescription: .name, fullDescription: .desc})}}, results: (.alerts[] | {ruleId: .pluginId, message: .desc, locations: [{physicalLocation: {artifactLocation: {uri: .url}}}]})}]}' $REPORT_DIR/zap_report.json > $REPORT_DIR/zap_report.sarif
+                    """
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
@@ -41,7 +64,8 @@ pipeline {
                             -Dsonar.sources=. \
                             -Dsonar.python.version=3.13 \
                             -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.token=$SONAR_AUTH_TOKEN
+                            -Dsonar.token=$SONAR_AUTH_TOKEN \
+                            -Dsonar.externalIssuesReportPaths=$REPORT_DIR/zap_report.sarif
                         """
                     }
                 }
@@ -70,38 +94,6 @@ pipeline {
                         dependencyCheckPublisher pattern: 'dependency-check-report/dependency-check-report.xml'
                     } else {
                         error "Le fichier requirements.txt est manquant. Impossible d'analyser les dépendances Python."
-                    }
-                }
-            }
-        }
-
-        stage('Run OWASP ZAP Scan') {
-            steps {
-                script {
-                    sh """
-                    mkdir -p $REPORT_DIR
-                    sudo $ZAP_PATH -daemon -config api.disablekey=true &
-                    sleep 15  # Laisser ZAP démarrer
-
-                    sudo zap-cli --zap-url http://localhost open-url $TARGET_URL
-
-                    # Lancer un scan automatique
-                    sudo zap-cli --zap-url http://localhost active-scan --scanners all --recursive $TARGET_URL
-
-                    # # Générer un rapport
-                    curl "http://localhost:8090/JSON/core/view/alerts/?baseurl=$TARGET_URL" -o $REPORT_DIR/zap_report.json
-                    """
-                }
-            }
-        }
-
-        stage('Import ZAP Report into SonarQube') {
-            steps {
-                script {
-                    withSonarQubeEnv('sonarqube') {
-                        sh """
-                        curl -X POST -u $SONAR_AUTH_TOKEN: -H "Content-Type: application/json" -d @$REPORT_DIR/zap-report.json "$SONAR_HOST_URL/api/issues/import"
-                        """
                     }
                 }
             }
